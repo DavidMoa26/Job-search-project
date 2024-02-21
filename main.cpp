@@ -9,7 +9,8 @@
 
 using namespace std;
 using namespace SQLite;
-//test
+#include <SQLiteCpp/SQLiteCpp.h>
+#include <iostream>
 enum MainMenu{SIGN_UP = '1', LOGIN,FORGOT_PASSWORD,EXIT};
 enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};
 enum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3,QUESTION_4,QUESTION_5,GO_BACK};
@@ -41,7 +42,6 @@ void mainMenu(Database&db)
     while (!illegalOption)
     {
         cout << "JobSearch\n"
-                "d"
                 "1. Sign up.\n"
                 "2. Login.\n"
                 "3. forgot password.\n"
@@ -77,7 +77,7 @@ void mainMenu(Database&db)
         }
     }
 }
-void secondMenuCandidate()
+void secondMenuCandidate(Database&db)
 {
     char option;
 
@@ -113,7 +113,7 @@ void secondMenuCandidate()
         }
     }
 }
-void secondMenuEmployer()
+void secondMenuEmployer(Database&db)
 {
     char option;
     cout << "JobSearch\n"
@@ -142,8 +142,7 @@ void secondMenuEmployer()
         }
     }
 }
-#include <SQLiteCpp/SQLiteCpp.h>
-#include <iostream>
+
 
 void login(SQLite::Database& db) {
     while (true) {
@@ -167,15 +166,15 @@ void login(SQLite::Database& db) {
                 if (userCheck.executeStep())
                 {
                     role = userCheck.getColumn(0).getText();
-                    if (role == "c")
+                    if (role == "C")
                     {
                         std::cout << "Login successful as a candidate. Welcome!\n";
-                        secondMenuCandidate();
+                        secondMenuCandidate(db);
                         return; // Exit the login function
-                    } else if (role == "e")
+                    } else if (role == "E")
                     {
                         std::cout << "Login successful as an employee. Welcome!\n";
-                        secondMenuEmployer();
+                        secondMenuEmployer(db);
                         return; // Exit the login function
                     } else
                     {
@@ -206,24 +205,70 @@ void login(SQLite::Database& db) {
     }
 }
 
-void signUp(Database&db) {
+void signUp(Database&db)
+{
     string id, password, name, question, answer, age,freetext;
     char UserCandidateEmployee;
+    char get_out;
     cout << "Dear user, please enter your details to sign up.\n";
-    if (!validateId(id))
-        return;
+    while (true)
+    {
+        if (!validateId(id))
+            return;
+
+        SQLite::Statement checkQuery(db, "SELECT COUNT(*) FROM user WHERE id=?;");
+        checkQuery.bind(1, id);
+        if (checkQuery.executeStep())
+        {
+            int count = checkQuery.getColumn(0).getInt();
+            if (count > 0)
+            {
+                std::cout << "User with ID " << id << " already exists. Please try again.\n";
+            }
+            else
+                break;
+        }
+        cout << "Press '0' to return to the main menu.\n"
+             << "Press any other character to enter id again.\n";
+        cin >> get_out;
+        if (get_out == '0')
+            return;
+
+    }
     if(!passwordDifficulty(password))
         return;
+    cin.ignore();
     if(!validateName(name))
         return;
+    cin.ignore();
     if(!validateAge(age))
         return;
+    cin.ignore();
     if (!selectQuestion(question, answer))
         return;
+    cin.ignore();
     if(!validFreeText(freetext))
         return;
     if(!EmployerOrCandidate(UserCandidateEmployee))
         return;
+    cout << UserCandidateEmployee;
+    try {
+        SQLite::Statement query(db, "INSERT INTO user (id, password, role, age, name) VALUES (?, ?, ?, ?, ?);");
+        query.bind(1, id);
+        query.bind(2, password);
+        query.bind(3, std::string(1, UserCandidateEmployee)); // Assuming 'C' for Candidate and 'E' for Employee
+        query.bind(4, std::stoi(age)); // Convert age to integer
+        query.bind(5, name);
+
+        // Execute the query
+        if (query.exec() == 1) {
+        } else {
+            std::cerr << "Error: Failed to insert user details into the database.\n";
+        }
+    } catch (std::exception& e)
+    {
+        std::cerr << "SQLite error: " << e.what() << std::endl;
+    }
     //privacy policy
     // Perform further operations such as database validation here...add question to db and details to database
     cout << "congratulations you successfully registered!\n";
@@ -437,7 +482,7 @@ bool EmployerOrCandidate(char &EorC)
     cin.ignore(); // Clear the newline character from the buffer
 
     while (true) {
-        if (EorC == 'C' || EorC == 'E')
+        if (EorC == 'C' ||   EorC == 'E')
         {
             break;
         }
