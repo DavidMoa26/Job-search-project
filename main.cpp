@@ -17,6 +17,8 @@ enum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3,QUESTION_4,QUESTI
 enum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS, VIEW_CANDIDATES_PROFILES, LOG_OUT_E};
 enum {NUMBER_PROBLEM1 = 1,NUMBER_PROBLEM2};
 enum {COUNT_FEEDBACK = 0,COUNT_FEEDBACK1,COUNT_FEEDBACK2,COUNT_FEEDBACK3};
+void dbSignUpDetails(string&,string&,string&,string&,char,Database&);
+void dbSignUpQuestion(string&,string&,string&,Database&);
 void mainMenu(Database&);
 void secondMenuCandidate(Database&);
 void secondMenuEmployer(Database&);
@@ -251,26 +253,9 @@ void signUp(Database&db)
         return;
     if(!EmployerOrCandidate(UserCandidateEmployee))
         return;
-    cout << UserCandidateEmployee;
-    try {
-        SQLite::Statement query(db, "INSERT INTO user (id, password, role, age, name) VALUES (?, ?, ?, ?, ?);");
-        query.bind(1, id);
-        query.bind(2, password);
-        query.bind(3, std::string(1, UserCandidateEmployee)); // Assuming 'C' for Candidate and 'E' for Employee
-        query.bind(4, std::stoi(age)); // Convert age to integer
-        query.bind(5, name);
-
-        // Execute the query
-        if (query.exec() == 1) {
-        } else {
-            std::cerr << "Error: Failed to insert user details into the database.\n";
-        }
-    } catch (std::exception& e)
-    {
-        std::cerr << "SQLite error: " << e.what() << std::endl;
-    }
+    dbSignUpDetails(id,password,name,age,UserCandidateEmployee,db);
+    dbSignUpQuestion(id,question,answer,db);
     //privacy policy
-    // Perform further operations such as database validation here...add question to db and details to database
     cout << "congratulations you successfully registered!\n";
 }
 bool validateId(string &id) {
@@ -506,4 +491,43 @@ bool EmployerOrCandidate(char &EorC)
     }
 
     return true;
+}
+void dbSignUpDetails(string &id,string &password,string& name,string& age,char UserCandidateEmployee,Database&db)
+{
+    try {
+        SQLite::Statement query(db, "INSERT INTO user (id, password, role, age, name) VALUES (?, ?, ?, ?, ?);");
+        query.bind(1, id);
+        query.bind(2, password);
+        query.bind(3, std::string(1, UserCandidateEmployee)); // Assuming 'C' for Candidate and 'E' for Employee
+        query.bind(4, std::stoi(age)); // Convert age to integer
+        query.bind(5, name);
+
+        // Execute the query
+        if (query.exec() == 1) {
+        } else {
+            std::cerr << "Error: Failed to insert user details into the database.\n";
+        }
+    } catch (std::exception& e)
+    {
+        std::cerr << "SQLite error: " << e.what() << std::endl;
+    }
+}
+void dbSignUpQuestion(string&id,string&question,string&answer,Database&db)
+{
+    try {
+        SQLite::Statement query(db, "INSERT INTO security_questions (id, question,answer) VALUES (?, ?, ?);");
+        query.bind(1, id);
+        query.bind(2, question);
+        query.bind(3, answer);
+
+
+        // Execute the query
+        if (query.exec() == 1) {
+        } else {
+            std::cerr << "Error: Failed to insert user details into the database.\n";
+        }
+    } catch (std::exception& e)
+    {
+        std::cerr << "SQLite error: " << e.what() << std::endl;
+    }
 }
