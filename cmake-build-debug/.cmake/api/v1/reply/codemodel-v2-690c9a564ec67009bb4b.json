@@ -1,0 +1,142 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.17"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "SQLiteCpp",
+					"childIndexes" : 
+					[
+						2
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-SQLiteCpp-Debug-2bda7d21aacebfcb4f9c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "SQLiteCpp",
+					"targetIndexes" : 
+					[
+						1,
+						2
+					]
+				},
+				{
+					"build" : "SQLiteCpp/sqlite3",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-SQLiteCpp.sqlite3-Debug-0074bc4808dc2437ceef.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "SQLiteCpp/sqlite3",
+					"targetIndexes" : 
+					[
+						3
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Job_Search",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1,
+						2
+					],
+					"name" : "SQLiteCpp",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Job_Search::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Job_Search-Debug-c122e288d2e3c5752f2f.json",
+					"name" : "Job_Search",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "SQLiteCpp::@962873412d7fadcc09ba",
+					"jsonFile" : "target-SQLiteCpp-Debug-5bfaaf7ca64135fe2d2b.json",
+					"name" : "SQLiteCpp",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "SQLiteCpp_cpplint::@962873412d7fadcc09ba",
+					"jsonFile" : "target-SQLiteCpp_cpplint-Debug-ad463e7e2f6e489b62b5.json",
+					"name" : "SQLiteCpp_cpplint",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "sqlite3::@7bb24b3eac3ba40d74cd",
+					"jsonFile" : "target-sqlite3-Debug-3ec05fcfc6977f51e1a8.json",
+					"name" : "sqlite3",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/hdani/CLionProjects/Job_Search/cmake-build-debug",
+		"source" : "C:/Users/hdani/CLionProjects/Job_Search"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
