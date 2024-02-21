@@ -1,0 +1,14 @@
+# ninja log v5
+12	533	7301407710588039	SQLiteCpp/CMakeFiles/SQLiteCpp.dir/src/Exception.cpp.obj	1b58afb138a53e35
+31	926	7301407714528298	SQLiteCpp/CMakeFiles/SQLiteCpp.dir/src/Savepoint.cpp.obj	fc8b0a6002f9e951
+5	618	7302181845079600	CMakeFiles/Job_Search.dir/main.cpp.obj	88dd0a99d5d0fe2e
+10539	10752	7301407812761869	SQLiteCpp/sqlite3/libsqlite3.a	422f1eafb626ad73
+9	936	7301407714618056	SQLiteCpp/CMakeFiles/SQLiteCpp.dir/src/Backup.cpp.obj	356f099424bc8daf
+37	960	7301407714877369	SQLiteCpp/CMakeFiles/SQLiteCpp.dir/src/Transaction.cpp.obj	7ad651bbbe98e7a4
+43	1188	7301407717180515	SQLiteCpp/CMakeFiles/SQLiteCpp.dir/src/Statement.cpp.obj	901c8fcc7d51d298
+20	1031	7301407715594753	SQLiteCpp/CMakeFiles/SQLiteCpp.dir/src/Column.cpp.obj	7127f364d13891e2
+26	1209	7301407717389984	SQLiteCpp/CMakeFiles/SQLiteCpp.dir/src/Database.cpp.obj	9469be5d84e3e42a
+1	10511	7301407810238562	CMakeFiles/Job_Search.dir/SQLiteCpp/sqlite3/sqlite3.c.obj	73e9accdfd228566
+536	10539	7301407810487914	SQLiteCpp/sqlite3/CMakeFiles/sqlite3.dir/sqlite3.c.obj	ab04b40f834e9f94
+10752	10884	7301407814118805	SQLiteCpp/libSQLiteCpp.a	5ad194fb999f4281
+619	981	7302181848692355	Job_Search.exe	8352683dc9c15ebd
