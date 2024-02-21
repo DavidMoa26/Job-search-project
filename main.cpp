@@ -41,6 +41,7 @@ void mainMenu()
     while (!illegalOption)
     {
         cout << "JobSearch\n"
+                "d"
                 "1. Sign up.\n"
                 "2. Login.\n"
                 "3. forgot password.\n"
