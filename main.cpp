@@ -30,6 +30,7 @@ bool passwordDifficulty(string&);
 bool EmployerOrCandidate(char&);
 int main()
 {
+    Database db("db.db", OPEN_READWRITE|OPEN_CREATE);
     mainMenu();
     return 0;
 }

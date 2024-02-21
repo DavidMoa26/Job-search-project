@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/hdani/CLionProjects/Job_Search/SQLiteCpp
+# Install script for directory: C:/Users/User/Documents/GitHub/Job-search-projecs/SQLiteCpp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,18 +38,18 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xlibrariesx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/hdani/CLionProjects/Job_Search/cmake-build-debug/SQLiteCpp/libSQLiteCpp.a")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/User/Documents/GitHub/Job-search-projecs/cmake-build-debug/SQLiteCpp/libSQLiteCpp.a")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xheadersx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE DIRECTORY FILES "C:/Users/hdani/CLionProjects/Job_Search/SQLiteCpp/include/" FILES_MATCHING REGEX ".*\\.(hpp|h)$")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE DIRECTORY FILES "C:/Users/User/Documents/GitHub/Job-search-projecs/SQLiteCpp/include/" FILES_MATCHING REGEX ".*\\.(hpp|h)$")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/SQLiteCpp/SQLiteCppTargets.cmake")
     file(DIFFERENT EXPORT_FILE_CHANGED FILES
          "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/SQLiteCpp/SQLiteCppTargets.cmake"
-         "C:/Users/hdani/CLionProjects/Job_Search/cmake-build-debug/SQLiteCpp/CMakeFiles/Export/lib/cmake/SQLiteCpp/SQLiteCppTargets.cmake")
+         "C:/Users/User/Documents/GitHub/Job-search-projecs/cmake-build-debug/SQLiteCpp/CMakeFiles/Export/lib/cmake/SQLiteCpp/SQLiteCppTargets.cmake")
     if(EXPORT_FILE_CHANGED)
       file(GLOB OLD_CONFIG_FILES "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/SQLiteCpp/SQLiteCppTargets-*.cmake")
       if(OLD_CONFIG_FILES)
@@ -58,26 +58,26 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
       endif()
     endif()
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/SQLiteCpp" TYPE FILE FILES "C:/Users/hdani/CLionProjects/Job_Search/cmake-build-debug/SQLiteCpp/CMakeFiles/Export/lib/cmake/SQLiteCpp/SQLiteCppTargets.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/SQLiteCpp" TYPE FILE FILES "C:/Users/User/Documents/GitHub/Job-search-projecs/cmake-build-debug/SQLiteCpp/CMakeFiles/Export/lib/cmake/SQLiteCpp/SQLiteCppTargets.cmake")
   if("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/SQLiteCpp" TYPE FILE FILES "C:/Users/hdani/CLionProjects/Job_Search/cmake-build-debug/SQLiteCpp/CMakeFiles/Export/lib/cmake/SQLiteCpp/SQLiteCppTargets-debug.cmake")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/SQLiteCpp" TYPE FILE FILES "C:/Users/User/Documents/GitHub/Job-search-projecs/cmake-build-debug/SQLiteCpp/CMakeFiles/Export/lib/cmake/SQLiteCpp/SQLiteCppTargets-debug.cmake")
   endif()
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/SQLiteCpp" TYPE FILE FILES "C:/Users/hdani/CLionProjects/Job_Search/SQLiteCpp/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/SQLiteCpp" TYPE FILE FILES "C:/Users/User/Documents/GitHub/Job-search-projecs/SQLiteCpp/package.xml")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/SQLiteCpp" TYPE FILE FILES
-    "C:/Users/hdani/CLionProjects/Job_Search/cmake-build-debug/SQLiteCpp/cmake/SQLiteCppConfig.cmake"
-    "C:/Users/hdani/CLionProjects/Job_Search/cmake-build-debug/SQLiteCpp/cmake/SQLiteCppConfigVersion.cmake"
+    "C:/Users/User/Documents/GitHub/Job-search-projecs/cmake-build-debug/SQLiteCpp/cmake/SQLiteCppConfig.cmake"
+    "C:/Users/User/Documents/GitHub/Job-search-projecs/cmake-build-debug/SQLiteCpp/cmake/SQLiteCppConfigVersion.cmake"
     )
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("C:/Users/hdani/CLionProjects/Job_Search/cmake-build-debug/SQLiteCpp/sqlite3/cmake_install.cmake")
+  include("C:/Users/User/Documents/GitHub/Job-search-projecs/cmake-build-debug/SQLiteCpp/sqlite3/cmake_install.cmake")
 
 endif()
 

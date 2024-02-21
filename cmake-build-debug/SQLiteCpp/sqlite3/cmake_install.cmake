@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/hdani/CLionProjects/Job_Search/SQLiteCpp/sqlite3
+# Install script for directory: C:/Users/User/Documents/GitHub/Job-search-projecs/SQLiteCpp/sqlite3
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,10 +38,10 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xlibrariesx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/hdani/CLionProjects/Job_Search/cmake-build-debug/SQLiteCpp/sqlite3/libsqlite3.a")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/User/Documents/GitHub/Job-search-projecs/cmake-build-debug/SQLiteCpp/sqlite3/libsqlite3.a")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xheadersx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES "C:/Users/hdani/CLionProjects/Job_Search/SQLiteCpp/sqlite3/sqlite3.h")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES "C:/Users/User/Documents/GitHub/Job-search-projecs/SQLiteCpp/sqlite3/sqlite3.h")
 endif()
 
