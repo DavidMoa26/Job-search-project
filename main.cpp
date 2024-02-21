@@ -9,7 +9,7 @@
 
 using namespace std;
 using namespace SQLite;
-
+//test
 enum MainMenu{SIGN_UP = '1', LOGIN,FORGOT_PASSWORD,EXIT};
 enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};
 enum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3,QUESTION_4,QUESTION_5,GO_BACK};
