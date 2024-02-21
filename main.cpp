@@ -6,7 +6,7 @@
 #define MIN_PASSWORD_SIZE 6
 #define SPACE ' '
 #define ID_VALID 9
-#define D 3
+
 using namespace std;
 using namespace SQLite;
 
