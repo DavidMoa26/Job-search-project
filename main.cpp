@@ -16,25 +16,25 @@ enum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3,QUESTION_4,QUESTI
 enum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS, VIEW_CANDIDATES_PROFILES, LOG_OUT_E};
 enum {NUMBER_PROBLEM1 = 1,NUMBER_PROBLEM2};
 enum {COUNT_FEEDBACK = 0,COUNT_FEEDBACK1,COUNT_FEEDBACK2,COUNT_FEEDBACK3};
-void mainMenu();
-void secondMenuCandidate();
-void secondMenuEmployer();
-void signUp();
+void mainMenu(Database&);
+void secondMenuCandidate(Database&);
+void secondMenuEmployer(Database&);
+void signUp(Database&);
 bool validateId(string &id);
 bool validateName(string &name);
 bool validateAge(string &age);
 bool selectQuestion(string &question, string &answer);
 bool validFreeText(string &freeText);
-void login();
+void login(Database&);
 bool passwordDifficulty(string&);
 bool EmployerOrCandidate(char&);
 int main()
 {
     Database db("db.db", OPEN_READWRITE|OPEN_CREATE);
-    mainMenu();
+    mainMenu(db);
     return 0;
 }
-void mainMenu()
+void mainMenu(Database&db)
 {
     char option;
     bool illegalOption = false;
@@ -53,13 +53,13 @@ void mainMenu()
 
             case SIGN_UP:
             {
-                signUp();
+                signUp(db);
                 break;
             }
 
             case LOGIN:
             {
-                login();
+                login(db);
                 break;
             }
             case FORGOT_PASSWORD:
@@ -142,33 +142,71 @@ void secondMenuEmployer()
         }
     }
 }
-void login()
-{
-    while(true)
-    {
-        string id, password;
-        char exit;
-        cout << "dear user please enter your ID:\n";
-        cin >> id;
-        cout << "please enter your password:\n";
-        cin >> password;
+#include <SQLiteCpp/SQLiteCpp.h>
+#include <iostream>
 
-//    db check validation
-        if(id == "1" && password == "123")
-        {
-            //check if the user is candidate or emplyer
-            //secondMenuCandidate();
-            //secondMenuEmployer()
-            return;
+void login(SQLite::Database& db) {
+    while (true) {
+        std::string id, password, role;
+        std::cout << "Please enter your ID:\n";
+        std::cin >> id;
+
+        // Check if the 'user' table exists
+        SQLite::Statement tableCheck(db, "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='user';");
+        if (tableCheck.executeStep()) {
+            int tableExists = tableCheck.getColumn(0).getInt();
+            if (tableExists > 0) {
+                // 'user' table exists, proceed with authentication
+                std::cout << "Please enter your password:\n";
+                std::cin >> password;
+
+                // Check if the user with the provided ID, password, and role exists
+                SQLite::Statement userCheck(db, "SELECT role FROM user WHERE id=? AND password=?;");
+                userCheck.bind(1, id);
+                userCheck.bind(2, password);
+                if (userCheck.executeStep())
+                {
+                    role = userCheck.getColumn(0).getText();
+                    if (role == "c")
+                    {
+                        std::cout << "Login successful as a candidate. Welcome!\n";
+                        secondMenuCandidate();
+                        return; // Exit the login function
+                    } else if (role == "e")
+                    {
+                        std::cout << "Login successful as an employee. Welcome!\n";
+                        secondMenuEmployer();
+                        return; // Exit the login function
+                    } else
+                    {
+                        std::cout << "Invalid role. Please contact the administrator.\n";
+                        // Ask the user if they want to return back
+                        char choice;
+                        std::cout << "Do you want to return back? (y/n): ";
+                        std::cin >> choice;
+                        if (choice == 'y' || choice == 'Y')
+                        {
+                            continue; // Go back to the start of the loop
+                        } else
+                        {
+                            return; // Exit the login function
+                        }
+                    }
+                } else {
+                    std::cout << "Invalid ID or password. Please try again.\n";
+                }
+            } else {
+                std::cout << "The 'user' table does not exist. Please contact the administrator.\n";
+                return; // Exit the login function
+            }
+        } else {
+            std::cerr << "Error: Failed to check for the existence of the 'user' table.\n";
+            return; // Exit the login function
         }
-        cout << "You entered a wrong detail\n";
-        cout << "If you want to go back enter the number 1\n";
-        cin >> exit;
-        if (exit == '1')
-            return;
     }
 }
-void signUp() {
+
+void signUp(Database&db) {
     string id, password, name, question, answer, age,freetext;
     char UserCandidateEmployee;
     cout << "Dear user, please enter your details to sign up.\n";
