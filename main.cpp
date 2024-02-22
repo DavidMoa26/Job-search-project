@@ -28,12 +28,17 @@ bool validFreeText(string &freeText);
 void login(Database&);
 bool passwordDifficulty(string&);
 bool EmployerOrCandidate(char&);
-int main()
-{
+bool checkIfUsersTableExists(Database& db);
+
+
+
+int main() {
     Database db("db.db", OPEN_READWRITE|OPEN_CREATE);
     mainMenu(db);
     return 0;
 }
+
+
 void mainMenu(Database&db)
 {
     char option;
@@ -41,7 +46,6 @@ void mainMenu(Database&db)
     while (!illegalOption)
     {
         cout << "JobSearch\n"
-                "d"
                 "1. Sign up.\n"
                 "2. Login.\n"
                 "3. forgot password.\n"
@@ -142,8 +146,6 @@ void secondMenuEmployer()
         }
     }
 }
-#include <SQLiteCpp/SQLiteCpp.h>
-#include <iostream>
 
 void login(SQLite::Database& db) {
     while (true) {
@@ -461,4 +463,31 @@ bool EmployerOrCandidate(char &EorC)
     }
 
     return true;
+}
+
+
+bool checkIfUsersTableExists(Database& db) {
+    try {
+        // Check if the 'users' table exists
+        bool tableExists = false;
+        Statement query(db, "SELECT name FROM sqlite_master WHERE type='table' AND name='user'");
+        tableExists = query.executeStep(); // true if the table exists
+
+        if (!tableExists) {
+            // If the table doesn't exist, create it
+            db.exec("CREATE TABLE users (\n"
+                    "    id       TEXT PRIMARY KEY UNIQUE NOT NULL,\n"
+                    "    password TEXT NOT NULL,\n"
+                    "    role     TEXT NOT NULL,\n"
+                    "    age      INTEGER NOT NULL,\n"
+                    "    name     TEXT NOT NULL\n"
+                    ")");
+            std::cout << "The 'users' table was created successfully." << std::endl;
+            return true; // Table created successfully
+        }
+        return true; // Table already exists
+    } catch (const std::exception& e) {
+        std::cerr << "An error occurred: " << e.what() << std::endl;
+        return false; // An error occurred
+    }
 }
