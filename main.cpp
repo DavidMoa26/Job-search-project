@@ -1,6 +1,5 @@
 #include <iostream>
 #include <SQLiteCpp/SQLiteCpp.h>
-#include "authentication.h"
 #include "menus.h"
 
 using namespace std;
@@ -10,6 +9,7 @@ int main()
 {
     Database db("db.db", OPEN_READWRITE|OPEN_CREATE);
     MainMenu(db);
+    cout << "GOODBYE\n";
     return 0;
 }
 

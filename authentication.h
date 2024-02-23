@@ -11,9 +11,13 @@ using namespace std;
 //Validation of fields
 bool CheckIdLength(string&);
 bool CheckIfIdIsDigits(string&);
-bool ValidateName(string&);
-bool ValidateAge(string&);
 bool ValidatePassword(string&);
+bool validateId(string &);
+bool validateName(string &);
+bool validateAge(string &);
+bool validFreeText(string &);
+bool passwordDifficulty(string&);
+bool selectQuestion(string &, string &);
 
 //Validation of tables
 bool UsersTableExists(Database&);
@@ -25,7 +29,7 @@ bool ForgotPasswordTableExists(Database&);
 string SelectForgotPasswordQuestion();
 string SelectCandidateOrEmployer();
 void CreateUsersTable(Database&);
-bool InsertUserToDatabase(Database&, string&, string&, string&, string&, string&);
+bool InsertUserToDatabase(Database&, string&, string&, string&, string&, string&,string&);
 bool InsertForgotPasswordDetailsToDatabase(Database&, string&,string&,string&);
 void Register(Database&);
 string Login(Database&);

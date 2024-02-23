@@ -5,7 +5,8 @@
 
 using namespace SQLite;
 
-void SearchJobs(Database& db) {
+void SearchJobs(Database& db)
+{
 
 }
 
