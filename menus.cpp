@@ -114,8 +114,6 @@ void MainMenu(Database& db)
             case LOGIN:
             {
                 string result = Login(db);
-                while(result == "ERROR")
-                    result = Login(db);
                 string role = GetUserRole(db,result);
                 if(role == "employer")
                     EmployerMenu(db,result);

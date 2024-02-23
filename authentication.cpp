@@ -273,8 +273,7 @@ void Register (Database& db) {
 }
 string Login (Database& db) {
     if (!UsersTableExists(db)) {
-        cout << "Users table does not exist.\n";
-        return "ERROR";
+        CreateUsersTable(db);
     }
     try {
         string id, password;
