@@ -388,7 +388,9 @@ void Register (Database& db) {
     InsertForgotPasswordDetailsToDatabase(db,id,question,answer);
 }
 string Login (Database& db) {
+
     char get_out;
+
     if (!UsersTableExists(db)) {
         cout << "users not exist.\n";
         return "ERROR";
