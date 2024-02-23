@@ -9,7 +9,6 @@ enum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3,QUESTION_4,QUESTI
 #define SPACE ' '
 enum {SIGN_UP = '1', LOGIN,FORGOT_PASSWORD,EXIT};
 enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT};
-enum {NUMBER_PROBLEM1 = 1,NUMBER_PROBLEM2};
 enum {COUNT_FEEDBACK = 0,COUNT_FEEDBACK1,COUNT_FEEDBACK2,COUNT_FEEDBACK3};
 #define ID_VALID 9
 
@@ -164,8 +163,14 @@ bool passwordDifficulty(string&password)
         int numberOfproblem = 3;
         cout << "enter the password\n";
         cin >> password;
-        if(password.length() < MIN_PASSWORD_SIZE || password.length() > MAX_PASSWORD_SIZE)
-            numberOfproblem = NUMBER_PROBLEM2;
+        while((password.length() < MIN_PASSWORD_SIZE || password.length() > MAX_PASSWORD_SIZE) || true)
+        {
+            cout << "you entered not valid password,please try again:\n";
+            cin >> password;
+            for(int i=0;i < password.length();++i)
+                
+        }
+
         for (int i=0;i < password.length();++i)
         {
             if((password[i] >= 33 && password[i] <= 47)||(password[i] >=58 && password[i] <= 64)||(password[i] >=91 && password[i] <= 96) )
@@ -188,18 +193,10 @@ bool passwordDifficulty(string&password)
 
             }
             if (password[i] == SPACE)
-                numberOfproblem = NUMBER_PROBLEM1;
+                numberOfproblem = 1;
         }
-        if(numberOfproblem == NUMBER_PROBLEM1)
-        {
-            cout << "you entered a space please enter password again\n ";
-            count = -1;
-        }
-        if(numberOfproblem == NUMBER_PROBLEM2)
-        {
-            cout << "you entered a not valid password Length\n";
-            count = -1;
-        }
+
+
         if (count == COUNT_FEEDBACK || count == COUNT_FEEDBACK1)
             cout << "The password is weak\n";
         if (count == COUNT_FEEDBACK2)
