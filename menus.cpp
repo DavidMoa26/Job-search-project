@@ -116,6 +116,8 @@ void MainMenu(Database& db)
                 string result = Login(db);
                 while(result == "ERROR")
                     result = Login(db);
+                if(result == "RETURN")
+                    break;
                 string role = GetUserRole(db,result);
                 if(role == "employer")
                     EmployerMenu(db,result);

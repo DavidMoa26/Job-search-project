@@ -1,7 +1,6 @@
 #include <SQLiteCpp/SQLiteCpp.h>
 #include "iostream"
 #include <string>
-#include <tuple>
 
 enum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3,QUESTION_4,QUESTION_5,GO_BACK};
 #define MAX_PASSWORD_SIZE 12
@@ -27,33 +26,6 @@ bool CheckIfIdIsDigits(string &id) {
         }
     }
     return true;
-}
-bool ValidatePassword(string &password) {
-    if (password.length() < 6 || password.length() > 12) {
-        return false;
-    }
-
-    int lowercaseCount = 0, uppercaseCount = 0, digitCount = 0, specialCharCount = 0;
-
-    for (char ch : password) {
-        if (islower(ch)) {
-            ++lowercaseCount;
-        } else if (isupper(ch)) {
-            ++uppercaseCount;
-        } else if (isdigit(ch)) {
-            ++digitCount;
-        } else {
-            ++specialCharCount;
-        }
-    }
-
-    int categoriesMet = 0;
-    if (lowercaseCount > 0) ++categoriesMet;
-    if (uppercaseCount > 0) ++categoriesMet;
-    if (digitCount > 0) ++categoriesMet;
-    if (specialCharCount > 0) ++categoriesMet;
-
-    return categoriesMet >= 3;
 }
 bool validateId(string &id) {
     char get_out;
@@ -159,16 +131,26 @@ bool passwordDifficulty(string&password)
         bool special_character = false;
         bool lowercase = false;
         bool uppercase = false;
-        int count = 0;
+        int counter = 0;
         int numberOfproblem = 3;
         cout << "enter the password\n";
         cin >> password;
-        while((password.length() < MIN_PASSWORD_SIZE || password.length() > MAX_PASSWORD_SIZE) || true)
+        while (true)
         {
-            cout << "you entered not valid password,please try again:\n";
+            int count = 0;
+            if(password.length() < MIN_PASSWORD_SIZE || password.length() > MAX_PASSWORD_SIZE)
+                --count;
+            ++count;
+            for (int i = 0; i < password.length(); ++i)
+            {
+                if(password[i] == ' ')
+                    --count;
+            }
+            ++count;
+            if(count == 2)
+                break;
+            cout << "you entered not valid password please try again:\n";
             cin >> password;
-            for(int i=0;i < password.length();++i)
-                
         }
 
         for (int i=0;i < password.length();++i)
@@ -176,32 +158,30 @@ bool passwordDifficulty(string&password)
             if((password[i] >= 33 && password[i] <= 47)||(password[i] >=58 && password[i] <= 64)||(password[i] >=91 && password[i] <= 96) )
             {
                 if(!special_character)
-                    ++count;
+                    ++counter;
                 special_character = true;
             }
             if(password[i]>=97 && password[i] <= 122)
             {
                 if(!lowercase)
-                    ++count;
+                    ++counter;
                 lowercase = true;
             }
             if(password[i] >=65 && password[i] <=90)
             {
                 if(!uppercase)
-                    ++count;
+                    ++counter;
                 uppercase = true;
 
             }
-            if (password[i] == SPACE)
-                numberOfproblem = 1;
+
         }
 
-
-        if (count == COUNT_FEEDBACK || count == COUNT_FEEDBACK1)
+        if (counter == COUNT_FEEDBACK || counter == COUNT_FEEDBACK1)
             cout << "The password is weak\n";
-        if (count == COUNT_FEEDBACK2)
+        if (counter == COUNT_FEEDBACK2)
             cout << "The password is medium\n";
-        if (count == COUNT_FEEDBACK3)
+        if (counter == COUNT_FEEDBACK3)
             cout << "The password is strong\n";
         cout << "Do you want to change your password?(press 0 for yes/any other character for no/to return to main menu press 1)\n";
         cin >> get_out;
@@ -408,38 +388,51 @@ void Register (Database& db) {
     InsertForgotPasswordDetailsToDatabase(db,id,question,answer);
 }
 string Login (Database& db) {
-
-
+    char get_out;
+    if (!UsersTableExists(db)) {
+        cout << "users not exist.\n";
+        return "ERROR";
+    }
     try {
         string id, password;
         cout << "Enter Your ID (must be 9 digits).\n";
         cin >> id;
-        while (!CheckIdLength(id) || !CheckIfIdIsDigits(id)) {
-            cout << "Invalid ID. ID must be exactly 9 digits long and contains only numbers. Please try again:\n";
-            cin >> id;
-        }
-        cout << "Enter Your password (must be between 6-12 digits,must contains lowercase,uppercase,numbers).\n";
+
+        cout << "Enter Your password.\n";
         cin >> password;
-        while (!ValidatePassword(password)) {
-            cout << "Invalid Password. Please try again:\n";
-            cin >> password;
-        }
+
         Statement query(db, "SELECT password,role FROM users WHERE id = ?");
         query.bind(1, stoi(id));
-        if (query.executeStep()) {
+        if (query.executeStep())
+        {
             string dbPassword = query.getColumn(0).getText();
             string role = query.getColumn(1).getText();
-            if (dbPassword == password) {
+            if (dbPassword == password)
+            {
                 return id;
-            } else {
+            }
+            else
+            {
                 cout << "Invalid password \n";
+                cout << "Do you want to return to the main menu(press 0 for yes/no any other character to try login again):\n";
+                cin >> get_out;
+                if(get_out == '0')
+                    return "RETURN";
                 return "ERROR";
             }
-        } else {
+        }
+        else
+        {
             cout << "User ID not found.\n";
+            cout << "Do you want to return to the main menu(press 0 for yes/no any other character to try login again):\n";
+            cin >> get_out;
+            if(get_out == '0')
+                return "RETURN";
             return "ERROR";
         }
-    } catch(exception& e) {
+
+    } catch(exception& e)
+    {
         cerr << "SQLite exception: " << e.what() << endl;
         return "ERROR";
     }
@@ -501,5 +494,4 @@ void ForgotPassword(Database& db) {
     if(CheckUserAnswer(db,id))
         ChangePassword(db,id);
 }
-
 
