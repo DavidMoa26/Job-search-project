@@ -1,6 +1,5 @@
 #include <iostream>
 #include <SQLiteCpp/SQLiteCpp.h>
-#include "authentication.h"
 #include "menus.h"
 
 using namespace std;

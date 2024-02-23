@@ -29,7 +29,7 @@ bool ForgotPasswordTableExists(Database&);
 string SelectForgotPasswordQuestion();
 string SelectCandidateOrEmployer();
 void CreateUsersTable(Database&);
-bool InsertUserToDatabase(Database&, string&, string&, string&, string&, string&);
+bool InsertUserToDatabase(Database&, string&, string&, string&, string&, string&,string&);
 bool InsertForgotPasswordDetailsToDatabase(Database&, string&,string&,string&);
 void Register(Database&);
 string Login(Database&);
