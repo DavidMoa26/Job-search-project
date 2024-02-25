@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.23.2)
 project(JobSearchProject)  # Adjust project name as needed
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 # Add the SQLiteCpp directory to the build
 add_subdirectory(SQLiteCpp)

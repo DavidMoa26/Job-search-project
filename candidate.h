@@ -5,10 +5,8 @@
 
 using namespace SQLite;
 
-void SearchJobs(Database& db)
-{
-
-}
+bool ViewAllJobs(Database& db, string& id);
+void SelectJob(Database& db);
 
 
 #endif //MAIN_CPP_CANDIDATE_H
