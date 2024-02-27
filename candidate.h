@@ -5,6 +5,7 @@
 
 using namespace SQLite;
 
+<<<<<<< HEAD
 // Designing
 void ChangeColor(int color);
 void printLine(int width, char borderChar, char fillChar);
@@ -32,3 +33,11 @@ void SubmitResume(Database& db, string& id, string& jobId);
 void ViewAllSubmittedJobs(Database& db, string& candidate_id);
 
 #endif //MAIN_CPP_CANDIDATE_H
+=======
+bool ViewAllJobs(Database& db, string& id);
+void SelectJob(Database& db);
+void viewInterviewInvitations(Database& db,string id);
+void CreateResumeTable(Database& db);
+
+#endif //MAIN_CPP_CANDIDATE_H
+>>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
