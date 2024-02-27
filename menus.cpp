@@ -2,9 +2,6 @@
 #include "authentication.h"
 #include "employer.h"
 #include "candidate.h"
-
-
-
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <string>
 #include "iostream"
@@ -13,7 +10,7 @@ using namespace std;
 
 enum SearchMenu{VIEW_ALL_JOBS = '1', SEARCH_BY_CATEGORY, BACK_TO_CANDIDATE_MENU};
 enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};
-enum EmployerMenu{PUBLISH_JOB = '1',DELETE_JOB,EDIT_JOB, VIEW_ALL_JOBS_YOU_PUBLISHED, VIEW_CANDIDATES_PROFILES,SEND_INVITATION,VIEW_INVITATION, LOG_OUT_E};
+enum EmployerMenu{PUBLISH_JOB = '1',DELETE_JOB,EDIT_JOB, VIEW_ALL_JOBS_YOU_PUBLISHED, VIEW_CANDIDATES_PROFILES,SEND_INVITATION,VIEW_INVITATION,FILTER, LOG_OUT_E};
 enum MainMenu{REGISTER = '1', LOGIN,FORGOT_PASSWORD,EXIT};
 
 
@@ -67,7 +64,8 @@ void EmployerMenu(Database& db, string& id) {
                 "5. Send question for candidate to test him .\n"
                 "6. Send an invitation to a candidate the submitted their resume.\n"
                 "7. View all the interview invitations the employer has send\n"
-                "8. Log out. \n"
+                "8. View all the interview invitations the employer has send\n"
+                "9. Log out. \n"
                 "Please enter your choice!\n";
         cin >> option;
 
@@ -92,6 +90,9 @@ void EmployerMenu(Database& db, string& id) {
                 break;
             case VIEW_INVITATION:
                 ViewAllInterviewInvitation(db,id);
+                break;
+            case FILTER:
+//                Create function to filter candidate by experience
                 break;
             case LOG_OUT_E:
                 flagForContinue = true;
