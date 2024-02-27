@@ -2,14 +2,24 @@
 #include "authentication.h"
 #include "employer.h"
 #include "candidate.h"
+<<<<<<< HEAD
+=======
+
+>>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <string>
 #include "iostream"
 using namespace SQLite;
 using namespace std;
+<<<<<<< HEAD
 enum SearchMenu{VIEW_ALL_JOBS = '1', SEARCH_BY_CATEGORY, BACK_TO_CANDIDATE_MENU};
 enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};
 enum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS_YOU_PUBLISHED, VIEW_CANDIDATES_PROFILES, LOG_OUT_E};
+=======
+
+enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED,EDIT_PROFILE , VIEW_INTERVIEW_INVITATIONS, LOG_OUT_C};
+enum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS, VIEW_CANDIDATES_PROFILES,SEND_INVITATION,VIEW_INVITATION, LOG_OUT_E};
+>>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
 enum MainMenu{REGISTER = '1', LOGIN,FORGOT_PASSWORD,EXIT};
 
 void EditDeleteMenu() {
@@ -31,12 +41,18 @@ void EditDeleteMenu() {
 
 void CandidateMenu(Database& db , string& id) {
     char option;
+<<<<<<< HEAD
     while (true) {
+=======
+
+    bool flagForContinue = false;
+    while (!flagForContinue) {
+>>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
         cout << "1. Look for jobs.\n"
                 "2. Create your resume.\n"
                 "3. View all the jobs you submitted your resume.\n"
-                "4. View all the interview invitations you got.\n"
-                "5. Edit your profile.\n"
+                "4. Edit your profile.\n"
+                "5. View all the interview invitations you got.\n"
                 "6. Log out from the system.\n"
                 "Please enter your choice : \n";
         cin >> option;
@@ -50,9 +66,9 @@ void CandidateMenu(Database& db , string& id) {
             case VIEW_JOBS_SUBMITTED:
                 ViewAllSubmittedJobs(db, id);
                 break;
-            case VIEW_INTERVIEW_INVITATIONS:
-                break;
             case EDIT_PROFILE:
+                break;
+            case VIEW_INTERVIEW_INVITATIONS:
                 break;
             case LOG_OUT_C:
                 return;
@@ -68,10 +84,13 @@ void EmployerMenu(Database& db, string& id) {
     {
         cout << "1. Publish a job.\n"
                 "2. View all the jobs you have already published.\n"
-                "3. View all the candidates who submitted their resumes for the jobs you published.\n"
-                "4. Log out. \n"
+                "3. View all the candidates who submitted their resumes for the jobs you published .\n"
+                "4. Send an invitation to a candidate the submitted their resume.\n"
+                "5. View all the interview invitations the employer has send\n"
+                "6. Log out. \n"
                 "Please enter your choice!\n";
         cin >> option;
+
         switch (option)
         {
             case PUBLISH_JOB:
@@ -81,6 +100,12 @@ void EmployerMenu(Database& db, string& id) {
                 FetchAllJobs(db,id);
                 break;
             case VIEW_CANDIDATES_PROFILES:
+                break;
+            case SEND_INVITATION:
+                SendInterviewInvitation(db,id);
+                break;
+            case VIEW_INVITATION:
+                ViewAllInterviewInvitation(db,id);
                 break;
             case LOG_OUT_E:
                 flagForContinue = true;
@@ -114,7 +139,13 @@ void MainMenu(Database& db)
             case LOGIN:
             {
                 string result = Login(db);
+<<<<<<< HEAD
                 if (result == "ERROR")
+=======
+                while(result == "ERROR")
+                    result = Login(db);
+                if(result == "RETURN")
+>>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
                     break;
                 string role = GetUserRole(db,result);
                 if(role == "employer")
@@ -138,6 +169,7 @@ void MainMenu(Database& db)
                 cout << "You enter an illegal option, please try again!" << endl;
         }
     }
+<<<<<<< HEAD
 }
 void LookForJobsMenu(Database& db, string& id)
 {
@@ -166,4 +198,6 @@ void LookForJobsMenu(Database& db, string& id)
                 cout << "You enter an illegal option, please try again!" << endl;
         }
     }
+=======
+>>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
 }
