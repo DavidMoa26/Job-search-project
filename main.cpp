@@ -1,5 +1,4 @@
 #include <iostream>
-<<<<<<< HEAD
 #include "SQLiteCpp/SQLiteCpp.h"
 #include "authentication.h"
 #include "menus.h"
@@ -16,12 +15,6 @@ enum ConsoleColor {
     BACKGROUND_RED       = 0x0040,
     BACKGROUND_INTENSITY = 0x0080
 };
-=======
-#include <SQLiteCpp/SQLiteCpp.h>
-#include "menus.h"
-#include "employer.h"
-
->>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
 using namespace std;
 using namespace SQLite;
 
@@ -29,7 +22,6 @@ int main()
 {
     Database db("db.db", OPEN_READWRITE|OPEN_CREATE);
     MainMenu(db);
-    cout << "GOODBYE\n";
     return 0;
 }
 
