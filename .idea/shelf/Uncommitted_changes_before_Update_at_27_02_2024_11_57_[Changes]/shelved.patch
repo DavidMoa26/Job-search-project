@@ -1,0 +1,377 @@
+Index: employer.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>#include \"employer.h\"\r\n#include \"authentication.h\"\r\n\r\nenum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3};\r\n\r\nstring SelectScope(){\r\n    while (true) {\r\n        cout << \"Please select scope of position:\\n\";\r\n        cout << \"1. Full-Time\\n\"\r\n             << \"2. Part-Time\\n\"\r\n             << \"3. Remote\\n\";\r\n        char option;\r\n        cin >> option;\r\n        switch (option) {\r\n            case QUESTION_1:\r\n                return \"Full-Time\";\r\n            case QUESTION_2:\r\n                return \"Part-Time\";\r\n            case QUESTION_3:\r\n                return \"Remote\";\r\n            default:\r\n                cout << \"You entered an illegal option. Please try again!\\n\";\r\n                continue;\r\n        }\r\n    }\r\n}\r\nbool JobsListExists (Database& db) {\r\n    try {\r\n        Statement query(db, \"SELECT name FROM sqlite_master WHERE type='table' AND name='jobs_list';\");\r\n        // Execute the query\r\n        if (query.executeStep()) {\r\n            return true;\r\n        } else {\r\n            return false;\r\n        }\r\n    } catch (const exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << std::endl;\r\n    }\r\n    return false;\r\n}\r\nvoid CreateJobsListTable(Database& db) {\r\n    try {\r\n        db.exec(\"CREATE TABLE IF NOT EXISTS jobs_list (\"\r\n                \"id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,\"\r\n                \"employer_id INTEGER NOT NULL,\"\r\n                \"company_name TEXT NOT NULL,\"\r\n                \"location TEXT NOT NULL,\"\r\n                \"position TEXT NOT NULL,\"\r\n                \"description TEXT NOT NULL,\"\r\n                \"scope TEXT NOT NULL,\"\r\n                \"experience INTEGER NOT NULL,\"\r\n                \"salary INTEGER NOT NULL,\"\r\n                \"FOREIGN KEY (employer_id) REFERENCES users(id));\");\r\n        cout << \"jobs_list table created.\\n\";\r\n    } catch (const exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << endl;\r\n    }\r\n}\r\nvoid InsertJobToDatabase(Database& db, string& id, string& name, string& location,string& position, string& description,string& scope,string& experience, string& salary) {\r\n    try {\r\n        // Prepare a SQL insert statement\r\n        Statement query(db, \"INSERT INTO jobs_list (employer_id, company_name, location, description,position, scope,experience,salary) VALUES (?, ?, ?,?, ?,?,?,?);\");\r\n\r\n        // Bind values to the statement\r\n        query.bind(1, stoi(id));\r\n        query.bind(2, name);\r\n        query.bind(3, location);\r\n        query.bind(4, description);\r\n        query.bind(5, position);\r\n        query.bind(6, scope);\r\n        query.bind(7, stoi(experience));\r\n        query.bind(8, stoi(salary));\r\n\r\n        // Execute the statement\r\n        query.exec();\r\n        cout <<\"job successfully added to the database.\\n\";\r\n    } catch (const exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << endl;\r\n    }\r\n}\r\nvoid PostJob(Database& db, string& id) {\r\n    string companyName, location, description,position,scope ,experience, salary;\r\n    cout << \"Enter Your company name : \\n\";\r\n    cin >> companyName;\r\n    while(companyName.empty()) {\r\n        cout << \"Company name cannot be empty. Please enter your company name:\\n\";\r\n        cin >> companyName;\r\n    }\r\n    cout << \"Enter Your company's location : \\n\";\r\n    cin >> location;\r\n    while(location.empty()) {\r\n        cout << \"location cannot be empty. Please try again:\\n\";\r\n        cin >> location;\r\n    }\r\n    cout << \"Enter job description : \\n\";\r\n    cin >> description;\r\n    while(description.empty()) {\r\n        cout << \"description cannot be empty. Please try again:\\n\";\r\n        cin >> description;\r\n    }\r\n    cout << \"Enter position : \\n\";\r\n    cin >> position;\r\n    while(position.empty()) {\r\n        cout << \"position cannot be empty. Please try again:\\n\";\r\n        cin >> position;\r\n    }\r\n    while(position.empty()) {\r\n        cout << \"position cannot be empty. Please try again:\\n\";\r\n        cin >> position;\r\n    }\r\n    scope = SelectScope();\r\n    cout << \"Enter experience for the position (must be numbers).\\n\";\r\n    cin >> experience;\r\n    while (!CheckIfIdIsDigits(experience)) {\r\n        cout << \"Invalid experience.must contains only numbers. Please try again:\\n\";\r\n        cin >> experience;\r\n    }\r\n    cout << \"Enter salary for the position (must be numbers).\\n\";\r\n    cin >> salary;\r\n    while (!CheckIfIdIsDigits(salary)) {\r\n        cout << \"Invalid salary .must contains only numbers. Please try again:\\n\";\r\n        cin >> salary;\r\n    }\r\n    if(!JobsListExists(db))\r\n        CreateJobsListTable(db);\r\n    InsertJobToDatabase(db,id,companyName,location,position,description,scope,experience,salary);\r\n}\r\nvoid FetchAllJobs(Database& db, string& id) {\r\n    if (!JobsListExists(db)) {\r\n        cout << \"jobs_list table does not exist.\\n\";\r\n        return;\r\n    }\r\n    try {\r\n        Statement query(db, \"SELECT * FROM jobs_list WHERE employer_id = ?\");\r\n        query.bind(1, stoi(id));\r\n        if (query.executeStep()) {\r\n            int jobId = query.getColumn(0).getInt();\r\n            string companyName = query.getColumn(2).getText();\r\n            string position = query.getColumn(4).getText();\r\n            string description = query.getColumn(5).getText();\r\n            cout << \"Job ID: \" << jobId << \", Company: \" << companyName << \", Position: \" << \"Description: \" << description <<  endl;\r\n        } else {\r\n            cout << \"No jobs found.\\n\";\r\n        }\r\n    } catch(exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << endl;\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/employer.cpp b/employer.cpp
+--- a/employer.cpp	(revision 061d417bace907b764cc47e5d0eb185f47b436a3)
++++ b/employer.cpp	(date 1708897394521)
+@@ -145,4 +145,89 @@
+     } catch(exception& e) {
+         cerr << "SQLite exception: " << e.what() << endl;
+     }
++}
++bool InterviewInvitationsExist(Database&)
++{
++
++}
++void ViewAllSubResumeProfiles(Database&)
++{
++
++}
++void SendInterviewInvitation(Database&db)
++{
++    int count = 0;
++    try {
++        // Select all candidate IDs and job names from the Submissions_table
++        Statement selectQuery(db, "SELECT candidate_id, job_name, status FROM Submissions_table;");
++        if (!selectQuery.executeStep()) {
++            cout << "No submissions found." << endl;
++            return; // Exit the function if no submissions are found
++        }
++
++        // Print available submissions
++        cout << "Available Submissions:" << endl;
++        while (true) {
++            string candidate_id = selectQuery.getColumn(0).getText();
++            string job_name = selectQuery.getColumn(1).getText();
++            string status = selectQuery.getColumn(2).getText();
++
++            // Check if status is "pending" or "accepted", and skip printing if true
++            if (status != "pending" && status != "accepted" )
++            {
++                cout << "Candidate ID: " << candidate_id << ", Job Name: " << job_name << endl;
++                ++count;
++            }
++
++            // Check if there are more rows, and move to the next row
++            if (!selectQuery.executeStep()) {
++                break; // Exit the loop if no more rows are available
++            }
++        }
++        if(count == 0)
++        {
++            cout << "None\n";
++            return;
++        }
++        // Ask the user to select one candidate ID
++        string selected_candidate_id;
++        cout << "Enter the candidate ID you want to send an invitation to: ";
++        cin >> selected_candidate_id;
++
++        // Update the status to "pending" for the selected candidate in the Submissions_table
++        Statement updateQuery(db, "UPDATE Submissions_table SET status = 'pending' WHERE candidate_id = ?;");
++        updateQuery.bind(1, selected_candidate_id);
++        updateQuery.exec();
++        cout << "Status updated to 'pending' for Candidate ID: " << selected_candidate_id << endl;
++
++        // Move the selected candidate ID to InterviewInvitations table
++        Statement insertQuery(db, "INSERT INTO Interview_invitations (candidate_id, job_name) "
++                                  "SELECT candidate_id, job_name FROM Submissions_table WHERE candidate_id = ?;");
++        insertQuery.bind(1, selected_candidate_id);
++        insertQuery.exec();
++        cout << "Candidate ID moved to Interview_invitations table." << endl;
++        Statement deleteQuery(db, "DELETE FROM Submissions_table WHERE candidate_id = ?;");
++        deleteQuery.bind(1, selected_candidate_id);
++        deleteQuery.exec();
++    } catch(const exception& e) {
++        cerr << "SQLite exception: " << e.what() << endl;
++    }
++
++}
++void ViewAllInterviewInvitation(Database&db)
++{
++    try {
++        // Select all data from Interview_invitations table
++        Statement selectQuery(db, "SELECT * FROM Interview_invitations;");
++        while (selectQuery.executeStep()) {
++            string candidate_id = selectQuery.getColumn(0).getText(); // Assuming candidate_id is the first column
++            string job_name = selectQuery.getColumn(1).getText(); // Assuming job_name is the second column
++
++            // Print the data
++            cout << "Candidate ID: " << candidate_id << ", Job Name: " << job_name << endl;
++            // Add more columns as needed
++        }
++    } catch(const exception& e) {
++        cerr << "SQLite exception: " << e.what() << endl;
++    }
+ }
+\ No newline at end of file
+Index: employer.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>#ifndef MAIN_CPP_EMPLOYER_H\r\n#define MAIN_CPP_EMPLOYER_H\r\n#include \"iostream\"\r\n#include <string>\r\n#include \"SQLiteCpp/SQLiteCpp.h\"\r\n\r\nusing namespace std;\r\nusing namespace SQLite;\r\n\r\nstring SelectScope();\r\nbool JobsListExists (Database&);\r\nvoid CreateJobsListTable(Database&);\r\nvoid PostJob(Database&, string&);\r\nvoid InsertJobToDatabase(Database& , string& , string& ,string&, string&, string&, string& , string&, string&);\r\nvoid FetchAllJobs(Database& , string&);\r\n\r\n#endif //xMAIN_CPP_EMPLOYER_H\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/employer.h b/employer.h
+--- a/employer.h	(revision 061d417bace907b764cc47e5d0eb185f47b436a3)
++++ b/employer.h	(date 1708893426978)
+@@ -13,5 +13,9 @@
+ void PostJob(Database&, string&);
+ void InsertJobToDatabase(Database& , string& , string& ,string&, string&, string&, string& , string&, string&);
+ void FetchAllJobs(Database& , string&);
+-
++void ViewAllSubResumeProfiles(Database&);
++void SendInterviewInvitation(Database&);
++void ViewAllInterviewInvitation(Database&);
++bool InterviewInvitationsExist(Database&);
++void CreatInterviewInvitationsTable(Database&);
+ #endif //xMAIN_CPP_EMPLOYER_H
+Index: candidate.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>#ifndef MAIN_CPP_CANDIDATE_H\r\n#define MAIN_CPP_CANDIDATE_H\r\n#include <SQLiteCpp/SQLiteCpp.h>\r\n\r\n\r\nusing namespace SQLite;\r\n\r\nbool ViewAllJobs(Database& db, string& id);\r\nvoid SelectJob(Database& db);\r\n\r\n\r\n#endif //MAIN_CPP_CANDIDATE_H
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/candidate.h b/candidate.h
+--- a/candidate.h	(revision 061d417bace907b764cc47e5d0eb185f47b436a3)
++++ b/candidate.h	(date 1708894081910)
+@@ -7,6 +7,6 @@
+ 
+ bool ViewAllJobs(Database& db, string& id);
+ void SelectJob(Database& db);
+-
++void viewInterviewInvitations(Database& db,string id);
+ 
+ #endif //MAIN_CPP_CANDIDATE_H
+\ No newline at end of file
+Index: authentication.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>#include <SQLiteCpp/SQLiteCpp.h>\r\n#include \"iostream\"\r\n#include <string>\r\n\r\nenum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3,QUESTION_4,QUESTION_5,GO_BACK};\r\n#define MAX_PASSWORD_SIZE 12\r\n#define MIN_PASSWORD_SIZE 6\r\n#define SPACE ' '\r\nenum {SIGN_UP = '1', LOGIN,FORGOT_PASSWORD,EXIT};\r\nenum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT};\r\nenum {COUNT_FEEDBACK = 0,COUNT_FEEDBACK1,COUNT_FEEDBACK2,COUNT_FEEDBACK3};\r\n#define ID_VALID 9\r\n\r\n\r\nusing namespace SQLite;\r\nusing namespace std;\r\n\r\n//Validation of fields\r\nbool CheckIdLength(string &id) {\r\n    return id.length() == 9;\r\n}\r\nbool CheckIfIdIsDigits(string &id) {\r\n    for (char ch : id) {\r\n        if (!isdigit(ch)) {\r\n            return false;\r\n        }\r\n    }\r\n    return true;\r\n}\r\nbool validPassword(string &password)\r\n{\r\n    char count = '1';\r\n    if(password.length() < MIN_PASSWORD_SIZE || password.length() > MAX_PASSWORD_SIZE)\r\n        count = '0';\r\n    for (int i = 0; i < password.length(); ++i)\r\n    {\r\n        if(password[i] == ' ')\r\n        {\r\n            count = '0';\r\n            break;\r\n        }\r\n\r\n    }\r\n\r\n    if (count == '0')\r\n    {\r\n        cout << \"you entered not valid password please try again:\\n\";\r\n        return false;\r\n    }\r\n    return true;\r\n}\r\nbool validateId(string &id) {\r\n        if (id.length() == ID_VALID)\r\n        {\r\n            bool valid = true;\r\n            for (char c : id)\r\n            {\r\n                if (c < '0' || c > '9')\r\n                {\r\n                    return false;\r\n                }\r\n            }\r\n\r\n        } else\r\n            return false;\r\n    return true;\r\n}\r\nbool validateName(string &name) {\r\n\r\n        for (char c : name)\r\n        {\r\n            if (!isalpha(c))\r\n            {\r\n                return false;\r\n            }\r\n        }\r\n        if (name.length() >= 50)\r\n        {\r\n            return false;\r\n        }\r\n\r\n    return true;\r\n}\r\nbool validateAge(string &age) {\r\n\r\n    int ageNumber = stoi(age);\r\n    if (ageNumber < 18 || ageNumber > 99)\r\n    {\r\n        return false;\r\n    }\r\n    return true;\r\n}\r\nbool validFreeText(string &freeText)\r\n{\r\n\r\n        if (freeText.length() > 200)\r\n        {\r\n            return false;\r\n        }\r\n\r\n        return true;\r\n\r\n}\r\nbool passwordDifficulty(string&password,char &get_out)\r\n{\r\n        string feedback;\r\n        bool special_character = false;\r\n        bool lowercase = false;\r\n        bool uppercase = false;\r\n        int counter = 0;\r\n\r\n        for (int i=0;i < password.length();++i)\r\n        {\r\n            if((password[i] >= 33 && password[i] <= 47)||(password[i] >=58 && password[i] <= 64)||(password[i] >=91 && password[i] <= 96) )\r\n            {\r\n                if(!special_character)\r\n                    ++counter;\r\n                special_character = true;\r\n            }\r\n            if(password[i]>=97 && password[i] <= 122)\r\n            {\r\n                if(!lowercase)\r\n                    ++counter;\r\n                lowercase = true;\r\n            }\r\n            if(password[i] >=65 && password[i] <=90)\r\n            {\r\n                if(!uppercase)\r\n                    ++counter;\r\n                uppercase = true;\r\n\r\n            }\r\n\r\n        }\r\n\r\n\r\n        if (counter == COUNT_FEEDBACK || counter == COUNT_FEEDBACK1)\r\n            cout << \"The password is weak\\n\";\r\n        if (counter == COUNT_FEEDBACK2)\r\n            cout << \"The password is medium\\n\";\r\n        if (counter == COUNT_FEEDBACK3)\r\n            cout << \"The password is strong\\n\";\r\n        cout << \"Do you want to change your password?(press 0 for yes/any other character for no/to return to main menu press 1)\\n\";\r\n        cin >> get_out;\r\n        if(get_out == '0')\r\n            return false;\r\n        if(get_out == '1')\r\n            return false;\r\n    return true;\r\n\r\n}\r\nbool selectQuestion(string &question, string &answer ,char &get_out)\r\n{\r\n\r\n\r\n        cout << \"Please select a number of question:\\n\";\r\n        cout << \"1. What is the name of your father?\\n\"\r\n             << \"2. What is the name of your mother?\\n\"\r\n             << \"3. What is the name of the school you attended?\\n\"\r\n             << \"4. What year were you born?\\n\"\r\n             << \"5. What is your favorite food?\\n\"\r\n             << \"6. Go back to the login/register menu\\n\";\r\n        char option;\r\n        cin >> option;\r\n        switch (option) {\r\n            case QUESTION_1:\r\n                question = \"What is the name of your father?\";\r\n                break;\r\n            case QUESTION_2:\r\n                question = \"What is the name of your mother?\";\r\n                break;\r\n            case QUESTION_3:\r\n                question = \"What is the name of the school you attended?\";\r\n                break;\r\n            case QUESTION_4:\r\n                question = \"What year were you born?\";\r\n                break;\r\n            case QUESTION_5:\r\n                question = \"What is your favorite food?\";\r\n                break;\r\n            case GO_BACK:\r\n            {\r\n                get_out = '0';\r\n                return false;\r\n            }\r\n\r\n            default:\r\n                cout << \"You entered an illegal option. Please try again!\\n\";\r\n                return false;\r\n        }\r\n        cout << \"Please enter your answer for \\\"\" << question << \"\\\":\\n\";\r\n        cin >> answer;\r\n         return true;\r\n\r\n\r\n}\r\n\r\n//Validation of tables\r\nbool UsersTableExists(Database& db) {\r\n    try {\r\n        Statement query(db, \"SELECT name FROM sqlite_master WHERE type='table' AND name='users';\");\r\n        // Execute the query\r\n        if (query.executeStep()) {\r\n            return true;\r\n        } else {\r\n            return false;\r\n        }\r\n    } catch (const exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << std::endl;\r\n    }\r\n    return false;\r\n}\r\nbool ForgotPasswordTableExists(Database& db) {\r\n    try {\r\n        Statement query(db, \"SELECT name FROM sqlite_master WHERE type='table' AND name='forgot_password';\");\r\n        // Execute the query\r\n        if (query.executeStep()) {\r\n            return true;\r\n        } else {\r\n            return false;\r\n        }\r\n    } catch (const exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << std::endl;\r\n    }\r\n    return false;\r\n}\r\n\r\n//Logic\r\nstring SelectCandidateOrEmployer(){\r\n    while (true) {\r\n        cout << \"Please select who are you:\\n\";\r\n        cout << \"1. candidate\\n\"\r\n             << \"2. employer\\n\";\r\n        char option;\r\n        cin >> option;\r\n        switch (option) {\r\n            case QUESTION_1:\r\n                return \"candidate\";\r\n            case QUESTION_2:\r\n                return \"employer\";\r\n            default:\r\n                cout << \"You entered an illegal option. Please try again!\\n\";\r\n                continue;\r\n        }\r\n    }\r\n}\r\nstring GetUserRole(Database& db, string& id) {\r\n    try {\r\n        Statement query(db, \"SELECT role FROM users WHERE id = ?\");\r\n        query.bind(1, stoi(id));\r\n        if (query.executeStep()) {\r\n            return query.getColumn(0).getText();\r\n        }\r\n        return \"Error\";\r\n    } catch (exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << endl;\r\n    }\r\n    return \"Error\";\r\n}\r\nvoid CreateUsersTable(Database& db) {\r\n    try {\r\n        db.exec(\"CREATE TABLE IF NOT EXISTS users (\"\r\n                \"id INTEGER PRIMARY KEY UNIQUE,\"\r\n                \"password TEXT NOT NULL,\"\r\n                \"name TEXT NOT NULL,\"\r\n                \"age INTEGER NOT NULL,\"\r\n                \"freeText TEXT NOT NULL,\"\r\n                \"role TEXT NOT NULL);\");\r\n        cout << \"Users table created.\\n\";\r\n    } catch (const exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << endl;\r\n    }\r\n}\r\nvoid CreateForgotPasswordTable(Database& db) {\r\n    try {\r\n        db.exec(\"CREATE TABLE IF NOT EXISTS forgot_password (\"\r\n                \"id INTEGER PRIMARY KEY,\"\r\n                \"question TEXT NOT NULL,\"\r\n                \"answer TEXT NOT NULL,\"\r\n                \"FOREIGN KEY(id) REFERENCES users(id)\"\r\n                \");\");\r\n        cout << \"Forgot password table created.\\n\";\r\n    } catch (const exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << endl;\r\n    }\r\n}\r\nbool InsertForgotPasswordDetailsToDatabase(Database& db, string& id, string& question ,string& answer) {\r\n    try {\r\n        // Prepare a SQL insert statement\r\n        Statement query(db, \"INSERT INTO forgot_password (id, question ,answer) VALUES (?, ?, ?);\");\r\n        // Bind values to the statement\r\n        query.bind(1, stoi(id)); // Assuming ID is a numeric value stored as text\r\n        query.bind(2, question);\r\n        query.bind(3, answer);\r\n\r\n        // Execute the statement\r\n        query.exec();\r\n        cout << \"Password recovery details saved.\\n\";\r\n        return true;\r\n    } catch (const exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << endl;\r\n        return false;\r\n    }\r\n}\r\nbool InsertUserToDatabase(Database& db, string& id, string& password, string& name, string& age, string& role,string&freetext) {\r\n    try {\r\n        // Prepare a SQL insert statement\r\n        Statement query(db, \"INSERT INTO users (id, password, name, age,freeText, role) VALUES (?, ?, ?,?, ?, ?);\");\r\n\r\n        // Bind values to the statement\r\n        query.bind(1, stoi(id)); // Assuming ID is a numeric value stored as text\r\n        query.bind(2, password);\r\n        query.bind(3, name);\r\n        query.bind(4, stoi(age)); // Convert age from string to integer\r\n        query.bind(5, freetext);\r\n        query.bind(6, role);\r\n\r\n        // Execute the statement\r\n        query.exec();\r\n        cout << \"User \" << name << \" successfully added to the database.\\n\";\r\n        return true;\r\n    } catch (const exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << endl;\r\n        return false;\r\n    }\r\n}\r\nvoid Register (Database& db) {\r\n    string id, password, name, age,role,question, answer,freetext;\r\n    char get_out;\r\n    if(!UsersTableExists(db))\r\n        CreateUsersTable(db);\r\n    cout << \"Dear user, please enter your details to sign up.\\n\";\r\n    cout << \"Please enter your ID (ID must contain 9 digits):\\n\";\r\n    cin.ignore();\r\n    getline(cin,id);\r\n    while (!validateId(id))\r\n    {\r\n        cout << \"You entered an invalid ID. ID must contain exactly 9 digits. Please try again.\\n\";\r\n        cout << \"Press '0' to return to the main menu.\\n\"\r\n             << \"Press any other character to enter ID again.\\n\";\r\n\r\n        cin >> get_out;\r\n        if (get_out == '0')\r\n            return;\r\n        cout << \"Please enter your ID (ID must contain 9 digits):\\n\";\r\n        cin.ignore();\r\n        getline(cin,id);\r\n    }\r\n    cout << \"Please enter a password (6 to 12 characters, no spaces).\\n\"\r\n            \"Feedback on password difficulty:\\n\"\r\n            \"- Strong: at least three of lowercase, uppercase, digits, special characters.\\n\"\r\n            \"- Medium: exactly two types of characters.\\n\"\r\n            \"- Weak: exactly one type of character.\\n\";\r\n    cin.ignore();\r\n    getline(cin,id);\r\n    while (!validPassword(password) || !passwordDifficulty(password ,get_out))\r\n    {\r\n        if (get_out == '1')\r\n            return;\r\n        cout << \"Please enter a password (6 to 12 characters, no spaces).\\n\"\r\n                \"Feedback on password difficulty:\\n\"\r\n                \"- Strong: at least three of lowercase, uppercase, digits, special characters.\\n\"\r\n                \"- Medium: exactly two types of characters.\\n\"\r\n                \"- Weak: exactly one type of character.\\n\";\r\n        getline(cin,id);\r\n    }\r\n    cout << \"Please enter your name (must contain only letters and not more than 50 letters):\\n\";\r\n    cin.ignore();\r\n    getline(cin,id);\r\n    while (!validateName(name))\r\n    {\r\n        cout << \"You entered an invalid name. Name must contain only letters and not exceed 50 characters. Please try again.\\n\";\r\n        cout << \"If you want to return to the main menu, press '0'. Otherwise, press any other character to enter the name again:\\n\";\r\n        cin >> get_out;\r\n        if (get_out == '0')\r\n            return;\r\n        cout << \"Please enter your name (must contain only letters and not more than 50 letters):\\n\";\r\n        getline(cin,id);\r\n    }\r\n    cout << \"Please enter your age (18 - 99):\\n\";\r\n    cin.ignore();\r\n    getline(cin,id);\r\n    while (!validateAge(age))\r\n    {\r\n        cout << \"You entered an invalid age. Age must be between 18 - 99. Please try again.\\n\";\r\n        cout << \"Press '0' to return to the main menu.\\n\"\r\n             << \"Press any other character to enter age again.\\n\";\r\n        cin >> get_out;\r\n        if (get_out == '0')\r\n            return;\r\n        cout << \"Please enter your age (18 - 99):\\n\";\r\n        getline(cin,id);\r\n    }\r\n    cout << \"please tell about yourself\\n\";\r\n    cin.ignore();\r\n    getline(cin, freetext);\r\n    while (!validFreeText(freetext))\r\n    {\r\n        cout << \"You entered an invalid free text. text must contain not more then 200 characters.\\n\";\r\n        cout << \"Press '0' to return to the main menu.\\n\"\r\n             << \"Press any other character to enter free text again.\\n\";\r\n        cin >> get_out;\r\n        if (get_out == '0')\r\n            return;\r\n        cout << \"please tell about yourself\\n\";\r\n        cin.ignore();\r\n        getline(cin, freetext);\r\n    }\r\n    while (!selectQuestion(question,answer,get_out))\r\n    {\r\n\r\n        if (get_out == '0')\r\n            return;\r\n    }\r\n\r\n    role = SelectCandidateOrEmployer();\r\n    if(InsertUserToDatabase(db,id,password,name,age,role,freetext))\r\n    {\r\n        return;\r\n    }\r\n    if(!ForgotPasswordTableExists(db))\r\n        CreateForgotPasswordTable(db);\r\n    InsertForgotPasswordDetailsToDatabase(db,id,question,answer);\r\n}\r\nstring Login (Database& db) {\r\n\r\n    char get_out;\r\n\r\n    if (!UsersTableExists(db)) {\r\n        cout << \"users not exist.\\n\";\r\n        return \"ERROR\";\r\n    }\r\n    try {\r\n        string id, password;\r\n        cout << \"Enter Your ID (must be 9 digits).\\n\";\r\n        cin >> id;\r\n\r\n        cout << \"Enter Your password.\\n\";\r\n        cin >> password;\r\n\r\n        Statement query(db, \"SELECT password,role FROM users WHERE id = ?\");\r\n        query.bind(1, stoi(id));\r\n        if (query.executeStep())\r\n        {\r\n            string dbPassword = query.getColumn(0).getText();\r\n            string role = query.getColumn(1).getText();\r\n            if (dbPassword == password)\r\n            {\r\n                return id;\r\n            }\r\n            else\r\n            {\r\n                cout << \"Invalid password \\n\";\r\n                cout << \"Do you want to return to the main menu(press 0 for yes/no any other character to try login again):\\n\";\r\n                cin >> get_out;\r\n                if(get_out == '0')\r\n                    return \"RETURN\";\r\n                return \"ERROR\";\r\n            }\r\n        }\r\n        else\r\n        {\r\n            cout << \"User ID not found.\\n\";\r\n            cout << \"Do you want to return to the main menu(press 0 for yes/no any other character to try login again):\\n\";\r\n            cin >> get_out;\r\n            if(get_out == '0')\r\n                return \"RETURN\";\r\n            return \"ERROR\";\r\n        }\r\n\r\n    } catch(exception& e)\r\n    {\r\n        cerr << \"SQLite exception: \" << e.what() << endl;\r\n        return \"ERROR\";\r\n    }\r\n}\r\nbool CheckUserAnswer(Database& db, string& id) {\r\n    if (!ForgotPasswordTableExists(db)) {\r\n        cout << \"forgot_password table does not exist.\\n\";\r\n        return false;\r\n    }\r\n    try {\r\n        string answer;\r\n        Statement query(db, \"SELECT question,answer FROM forgot_password WHERE id = ?\");\r\n        query.bind(1, stoi(id));\r\n        if (query.executeStep()) {\r\n            string dbQuestion = query.getColumn(0).getText();\r\n            string dbAnswer = query.getColumn(1).getText();\r\n            cout << \"For change your password answer the next question.:\\n\";\r\n            cout << dbQuestion << \"\\n\";\r\n            cin >> answer;\r\n            if (dbAnswer == answer) {\r\n                cout << \"Correct answer.\\n\";\r\n                return true;\r\n            } else {\r\n                cout << \"Invalid answer.\\n\";\r\n                return false;\r\n            }\r\n        } else {\r\n            cout << \"User ID not found.\\n\";\r\n            return false;\r\n        }\r\n    } catch(exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << endl;\r\n        return false;\r\n    }\r\n}\r\nvoid ChangePassword (Database& db, string& id) {\r\n    string newPassword;\r\n    char get_out;\r\n    cout << \"Please enter a password (6 to 12 characters, no spaces).\\n\"\r\n            \"Feedback on password difficulty:\\n\"\r\n            \"- Strong: at least three of lowercase, uppercase, digits, special characters.\\n\"\r\n            \"- Medium: exactly two types of characters.\\n\"\r\n            \"- Weak: exactly one type of character.\\n\";\r\n    cin >> newPassword;\r\n    while (!validPassword(newPassword) || !passwordDifficulty(newPassword ,get_out))\r\n    {\r\n        if (get_out == '1')\r\n            return;\r\n        cout << \"Please enter a password (6 to 12 characters, no spaces).\\n\"\r\n                \"Feedback on password difficulty:\\n\"\r\n                \"- Strong: at least three of lowercase, uppercase, digits, special characters.\\n\"\r\n                \"- Medium: exactly two types of characters.\\n\"\r\n                \"- Weak: exactly one type of character.\\n\";\r\n        cin >> newPassword;\r\n    }\r\n    try {\r\n        Statement query(db, \"UPDATE users SET password = ? WHERE id = ?\");\r\n        query.bind(1, newPassword);\r\n        query.bind(2, stoi(id));\r\n        query.exec();\r\n        cout << \"Password updated successfully.\\n\";\r\n\r\n    } catch(exception &e) {\r\n        cerr << \"SQLite exception: \" << e.what() << \"\\n\";\r\n    }\r\n}\r\nvoid ForgotPassword(Database& db) {\r\n    string id;\r\n    cout << \"Enter Your ID (must be 9 digits).\\n\";\r\n    cin >> id;\r\n    while (!CheckIdLength(id) || !CheckIfIdIsDigits(id)) {\r\n        cout << \"Invalid ID. ID must be exactly 9 digits long and contains only numbers. Please try again:\\n\";\r\n        cin >> id;\r\n    }\r\n    if(CheckUserAnswer(db,id))\r\n        ChangePassword(db,id);\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/authentication.cpp b/authentication.cpp
+--- a/authentication.cpp	(revision 061d417bace907b764cc47e5d0eb185f47b436a3)
++++ b/authentication.cpp	(date 1708889317360)
+@@ -351,8 +351,7 @@
+             "- Strong: at least three of lowercase, uppercase, digits, special characters.\n"
+             "- Medium: exactly two types of characters.\n"
+             "- Weak: exactly one type of character.\n";
+-    cin.ignore();
+-    getline(cin,id);
++    cin >> password;
+     while (!validPassword(password) || !passwordDifficulty(password ,get_out))
+     {
+         if (get_out == '1')
+@@ -362,11 +361,10 @@
+                 "- Strong: at least three of lowercase, uppercase, digits, special characters.\n"
+                 "- Medium: exactly two types of characters.\n"
+                 "- Weak: exactly one type of character.\n";
+-        getline(cin,id);
++        cin >> password;
+     }
+     cout << "Please enter your name (must contain only letters and not more than 50 letters):\n";
+-    cin.ignore();
+-    getline(cin,id);
++    cin >> name;
+     while (!validateName(name))
+     {
+         cout << "You entered an invalid name. Name must contain only letters and not exceed 50 characters. Please try again.\n";
+@@ -375,11 +373,10 @@
+         if (get_out == '0')
+             return;
+         cout << "Please enter your name (must contain only letters and not more than 50 letters):\n";
+-        getline(cin,id);
++        cin >> name;
+     }
+     cout << "Please enter your age (18 - 99):\n";
+-    cin.ignore();
+-    getline(cin,id);
++    cin >> age;
+     while (!validateAge(age))
+     {
+         cout << "You entered an invalid age. Age must be between 18 - 99. Please try again.\n";
+@@ -389,7 +386,7 @@
+         if (get_out == '0')
+             return;
+         cout << "Please enter your age (18 - 99):\n";
+-        getline(cin,id);
++        cin >> age;
+     }
+     cout << "please tell about yourself\n";
+     cin.ignore();
+Index: candidate.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>//\r\n// Created by david on 22/02/2024.\r\n//\r\n#include <SQLiteCpp/SQLiteCpp.h>\r\n#include \"iostream\"\r\n#include <string>\r\n#include \"employer.h\"\r\n#include \"candidate.h\"\r\n\r\nusing namespace std;\r\nbool ViewAllJobs(Database& db, string& id)\r\n{\r\n    if (!JobsListExists(db))\r\n    {\r\n        cout << \"Users table does not exist.\\n\";\r\n        return false;\r\n    }\r\n    try {\r\n        Statement query(db, \"SELECT * FROM jobs_list\");\r\n        if(query.executeStep())\r\n        {\r\n            while (query.executeStep())\r\n            {\r\n                string jobId = query.getColumn(0).getText();\r\n                string companyName = query.getColumn(2).getText();\r\n                string location = query.getColumn(3).getText();\r\n                string position = query.getColumn(4).getText();\r\n                string scope = query.getColumn(6).getText();\r\n                string experience = query.getColumn(7).getText();\r\n\r\n                cout << \" ---------------------------------\" << endl;\r\n                cout << jobId << \".\" << endl\r\n                     << \"   Company: \" << companyName  << endl\r\n                     << \"   Position: \" << position  << endl\r\n                     << \"   Location: \" << location  << endl\r\n                     << \"   Scope: \" << scope  << endl\r\n                     << \"   Experience years: \" << experience  << endl;\r\n            }\r\n            cout << \" ---------------------------------\" << endl;\r\n            return true;\r\n        }\r\n        else\r\n        {\r\n            cout << \"No jobs found.\\n\";\r\n            return false;\r\n        }\r\n    }\r\n    catch(exception & e)\r\n    {\r\n        cerr << \"SQLite exception: \" << e.what() << endl;\r\n        return false;\r\n    }\r\n}\r\nvoid SelectJob(Database& db)\r\n{\r\n    string choice;\r\n    cout << \"Select a job - press its number   |   Back - press 'b'.\" << endl;\r\n    cin >> choice;\r\n    if (choice == \"b\")\r\n        return;\r\n    try {\r\n        Statement query(db, \"SELECT * FROM jobs_list WHERE id = ?\");\r\n        query.bind(1, stoi(choice));\r\n        if (query.executeStep())\r\n        {\r\n            string jobId = query.getColumn(0);\r\n            if (jobId == choice)\r\n            {\r\n                string companyName = query.getColumn(2).getText();\r\n                string position = query.getColumn(4).getText();\r\n                string description = query.getColumn(5).getText();\r\n                cout << \"Job ID: \" << jobId << \", Company: \" << companyName << \", Position: \" << \"Description: \" << description <<  endl;\r\n            }\r\n        } else {\r\n            cout << \"No jobs found.\\n\";\r\n        }\r\n    } catch(exception& e) {\r\n        cerr << \"SQLite exception: \" << e.what() << endl;\r\n        }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/candidate.cpp b/candidate.cpp
+--- a/candidate.cpp	(revision 061d417bace907b764cc47e5d0eb185f47b436a3)
++++ b/candidate.cpp	(date 1708895367194)
+@@ -1,6 +1,4 @@
+-//
+-// Created by david on 22/02/2024.
+-//
++
+ #include <SQLiteCpp/SQLiteCpp.h>
+ #include "iostream"
+ #include <string>
+@@ -78,3 +76,51 @@
+         cerr << "SQLite exception: " << e.what() << endl;
+         }
+ }
++void viewInterviewInvitations(Database& db, string id) {
++    try {
++        // Retrieve and display interview invitations for the specific candidate ID
++        Statement selectQuery(db, "SELECT * FROM Submissions_table WHERE candidate_id = ?;");
++        selectQuery.bind(1, id); // Bind the candidate ID parameter
++        while (selectQuery.executeStep()) {
++            // Display each submission and provide options for accept/reject
++            // Extract data from the query result and present it to the candidate
++            string job_id = selectQuery.getColumn(0).getText();
++            string job_name = selectQuery.getColumn(2).getText();
++            string status = selectQuery.getColumn(3).getText();
++
++            cout << "Job ID: " << job_id << ", Job Name: " << job_name << ", Status: " << status << endl;
++            cout << "Accept (a) / Reject (r) / Go back (g)" << endl;
++
++            // Handle accept/reject options
++            char option;
++            cin >> option;
++            if (option == 'A' || option == 'a')
++            {
++                // Update status to "accepted" in the database
++                Statement updateQuery(db, "UPDATE Submissions_table SET status = 'accepted' WHERE candidate_id = ? AND job_id = ?;");
++                updateQuery.bind(1, id); // Bind the candidate ID parameter
++                updateQuery.bind(2, job_id);
++                updateQuery.exec();
++                cout << "Invitation accepted." << endl;
++            }
++            else if (option == 'R' || option == 'r')
++            {
++                // Update status to "rejected" in the database
++                Statement updateQuery(db, "UPDATE Submissions_table SET status = 'rejected' WHERE candidate_id = ? AND job_id = ?;");
++                updateQuery.bind(1, id); // Bind the candidate ID parameter
++                updateQuery.bind(2, job_id);
++                updateQuery.exec();
++                cout << "Invitation rejected." << endl;
++            }
++            else if (option == 'g' || option == 'G') {
++                return; // Go back
++            }
++            else {
++                cout << "Invalid option." << endl;
++            }
++        }
++    }
++    catch(const exception& e) {
++        cerr << "SQLite exception: " << e.what() << endl;
++    }
++}
+\ No newline at end of file
+Index: menus.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>#include \"menus.h\"\r\n#include \"authentication.h\"\r\n#include \"employer.h\"\r\n\r\n#include <SQLiteCpp/SQLiteCpp.h>\r\n#include <string>\r\n#include \"iostream\"\r\n\r\nusing namespace SQLite;\r\nusing namespace std;\r\n\r\nenum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};\r\nenum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS, VIEW_CANDIDATES_PROFILES, LOG_OUT_E};\r\nenum MainMenu{REGISTER = '1', LOGIN,FORGOT_PASSWORD,EXIT};\r\n\r\nvoid EditDeleteMenu() {\r\n    string choice, id;\r\n    cout << \"Please enter your choice : \\n\"\r\n            \"1. Edit jobs.\\n\"\r\n            \"2. Delete Jobs.\\n\"\r\n            \"Back - press any char\";\r\n    cin >> choice;\r\n    if(choice == \"1\"){\r\n        cout << \"Please enter job id : \\n\";\r\n        cin >> id;\r\n    }\r\n    if(choice == \"2\"){\r\n        cout << \"Please enter job id : \\n\";\r\n        cin >> id;\r\n    }\r\n};\r\n\r\nvoid CandidateMenu(Database& db , string& id) {\r\n    char option;\r\n    bool flagForContinue = false;\r\n    while (!flagForContinue) {\r\n        cout << \"1. Look for jobs.\\n\"\r\n                \"2. Create your resume\\n\"\r\n                \"3. View all the jobs you submitted your resume.\\n\"\r\n                \"4. View all the interview invitations you got.\\n\"\r\n                \"5. Edit your profile.\\n\"\r\n                \"6. Log out from the system.\\n\"\r\n                \"Please enter your choice : \\n\";\r\n        cin >> option;\r\n        switch (option) {\r\n            case LOOK_FOR_JOBS:\r\n                break;\r\n            case CREATE_RESUME:\r\n                break;\r\n            case VIEW_JOBS_SUBMITTED:\r\n                break;\r\n            case VIEW_INTERVIEW_INVITATIONS:\r\n                break;\r\n            case EDIT_PROFILE:\r\n                break;\r\n            case LOG_OUT_C:\r\n                flagForContinue = true;\r\n                break;\r\n            default:\r\n                cout << \"You enter an illegal option, please try again!\" << endl;\r\n        }\r\n    }\r\n}\r\nvoid EmployerMenu(Database& db, string& id) {\r\n    char option;\r\n    bool flagForContinue = false;\r\n    while (!flagForContinue)\r\n    {\r\n        cout << \"1. Publish a job.\\n\"\r\n                \"2. View all the jobs you have already published.\\n\"\r\n                \"3. View all the candidates who submitted their resumes for the jobs you published.\\n\"\r\n                \"4. Log out. \\n\"\r\n                \"Please enter your choice!\\n\";\r\n        cin >> option;\r\n        switch (option)\r\n        {\r\n            case PUBLISH_JOB:\r\n                PostJob(db,id);\r\n                break;\r\n            case VIEW_ALL_JOBS:\r\n                FetchAllJobs(db,id);\r\n                break;\r\n            case VIEW_CANDIDATES_PROFILES:\r\n                break;\r\n            case LOG_OUT_E:\r\n                flagForContinue = true;\r\n                break;\r\n            default:\r\n                cout << \"You enter an illegal option, please try again!\" << endl;\r\n        }\r\n    }\r\n}\r\nvoid MainMenu(Database& db)\r\n{\r\n    char option;\r\n    bool illegalOption = false;\r\n    while (!illegalOption)\r\n    {\r\n        cout << \"1. Register.\\n\"\r\n                \"2. Login.\\n\"\r\n                \"3. Forgot password.\\n\"\r\n                \"4. Exit.\\n\"\r\n                \"Please enter your choice:\\n\";\r\n        cin >> option;\r\n        switch (option)\r\n        {\r\n\r\n            case REGISTER:\r\n            {\r\n                Register(db);\r\n                break;\r\n            }\r\n\r\n            case LOGIN:\r\n            {\r\n                string result = Login(db);\r\n                while(result == \"ERROR\")\r\n                    result = Login(db);\r\n                if(result == \"RETURN\")\r\n                    break;\r\n                string role = GetUserRole(db,result);\r\n                if(role == \"employer\")\r\n                    EmployerMenu(db,result);\r\n                else\r\n                    CandidateMenu(db,result);\r\n                break;\r\n            }\r\n            case FORGOT_PASSWORD:\r\n            {\r\n                ForgotPassword(db);\r\n                break;\r\n            }\r\n            case EXIT:\r\n            {\r\n                illegalOption = true;\r\n                break;\r\n            }\r\n\r\n            default:\r\n                cout << \"You enter an illegal option, please try again!\" << endl;\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/menus.cpp b/menus.cpp
+--- a/menus.cpp	(revision 061d417bace907b764cc47e5d0eb185f47b436a3)
++++ b/menus.cpp	(date 1708894260075)
+@@ -1,6 +1,7 @@
+ #include "menus.h"
+ #include "authentication.h"
+ #include "employer.h"
++#include "candidate.h"
+ 
+ #include <SQLiteCpp/SQLiteCpp.h>
+ #include <string>
+@@ -9,8 +10,8 @@
+ using namespace SQLite;
+ using namespace std;
+ 
+-enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};
+-enum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS, VIEW_CANDIDATES_PROFILES, LOG_OUT_E};
++enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED,EDIT_PROFILE , VIEW_INTERVIEW_INVITATIONS, LOG_OUT_C};
++enum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS, VIEW_CANDIDATES_PROFILES,SEND_INVITATION,VIEW_INVITATION, LOG_OUT_E};
+ enum MainMenu{REGISTER = '1', LOGIN,FORGOT_PASSWORD,EXIT};
+ 
+ void EditDeleteMenu() {
+@@ -32,13 +33,14 @@
+ 
+ void CandidateMenu(Database& db , string& id) {
+     char option;
++
+     bool flagForContinue = false;
+     while (!flagForContinue) {
+         cout << "1. Look for jobs.\n"
+                 "2. Create your resume\n"
+                 "3. View all the jobs you submitted your resume.\n"
+-                "4. View all the interview invitations you got.\n"
+-                "5. Edit your profile.\n"
++                "4. Edit your profile.\n"
++                "5. View all the interview invitations you got.\n"
+                 "6. Log out from the system.\n"
+                 "Please enter your choice : \n";
+         cin >> option;
+@@ -49,9 +51,10 @@
+                 break;
+             case VIEW_JOBS_SUBMITTED:
+                 break;
+-            case VIEW_INTERVIEW_INVITATIONS:
++            case EDIT_PROFILE:
+                 break;
+-            case EDIT_PROFILE:
++            case VIEW_INTERVIEW_INVITATIONS:
++                viewInterviewInvitations(db,id);
+                 break;
+             case LOG_OUT_C:
+                 flagForContinue = true;
+@@ -68,10 +71,13 @@
+     {
+         cout << "1. Publish a job.\n"
+                 "2. View all the jobs you have already published.\n"
+-                "3. View all the candidates who submitted their resumes for the jobs you published.\n"
+-                "4. Log out. \n"
++                "3. View all the candidates who submitted their resumes for the jobs you published .\n"
++                "4. Send an invitation to a candidate the submitted their resume.\n"
++                "5. View all the interview invitations the employer has send\n"
++                "6. Log out. \n"
+                 "Please enter your choice!\n";
+         cin >> option;
++
+         switch (option)
+         {
+             case PUBLISH_JOB:
+@@ -81,6 +87,13 @@
+                 FetchAllJobs(db,id);
+                 break;
+             case VIEW_CANDIDATES_PROFILES:
++                ViewAllSubResumeProfiles(db);
++                break;
++            case SEND_INVITATION:
++                SendInterviewInvitation(db);
++                break;
++            case VIEW_INVITATION:
++                ViewAllInterviewInvitation(db);
+                 break;
+             case LOG_OUT_E:
+                 flagForContinue = true;
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ProjectModuleManager\">\r\n    <modules>\r\n      <module fileurl=\"file://$PROJECT_DIR$/.idea/Job-search-project.iml\" filepath=\"$PROJECT_DIR$/.idea/Job-search-project.iml\" />\r\n    </modules>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+--- a/.idea/modules.xml	(revision 061d417bace907b764cc47e5d0eb185f47b436a3)
++++ b/.idea/modules.xml	(date 1708879521031)
+@@ -3,6 +3,7 @@
+   <component name="ProjectModuleManager">
+     <modules>
+       <module fileurl="file://$PROJECT_DIR$/.idea/Job-search-project.iml" filepath="$PROJECT_DIR$/.idea/Job-search-project.iml" />
++      <module fileurl="file://$PROJECT_DIR$/.idea/Job_Search.iml" filepath="$PROJECT_DIR$/.idea/Job_Search.iml" />
+     </modules>
+   </component>
+ </project>
+\ No newline at end of file

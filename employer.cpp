@@ -227,7 +227,7 @@ void SendInterviewInvitation(Database&db,string&id)
         }
         printCandidateResume(db,select_id);
         char choice;
-        cout << "Do you want to accept (A/a) or reject (R/r) the invitation, or enter 'B' to go back?\n ";
+        cout << "Do you want to accept (A/a)  or enter 'B' to go back?\n ";
         cin >> choice;
         choice = tolower(choice); // Convert choice to lowercase
 
@@ -239,20 +239,13 @@ void SendInterviewInvitation(Database&db,string&id)
                 CreateInterviewInvitationTable(db);
             insertToInterviewInvitationtable(db,select_id,job_idSelected,id);
         }
-        else if (choice == 'r')
-        {
-            status = "rejected";
-            if(!InterviewInvitationsExist(db))
-                CreateInterviewInvitationTable(db);
-            insertToInterviewInvitationtable(db,select_id,job_idSelected,id);
-        }
         else if (choice == 'b')
         {
             break;
         }
         else
         {
-            cout << "Invalid choice. Please enter 'A', 'R', or 'B'." << endl;
+            cout << "Invalid choice. Please enter 'A' or 'B'." << endl;
             continue; // Restart the loop
         }
 
