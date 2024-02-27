@@ -8,18 +8,19 @@ using namespace std;
 using namespace SQLite;
 
 string SelectScope();
-bool JobsListExists (Database&);
-void CreateJobsListTable(Database&);
-void PostJob(Database&, string&);
-void InsertJobToDatabase(Database& , string& , string& ,string&, string&, string&, string& , string&, string&);
-void FetchAllJobs(Database& , string&);
-void ViewAllSubResumeProfiles(Database&);
-void SendInterviewInvitation(Database&db,string&id);
-void ViewAllInterviewInvitation(Database&);
+bool JobsListExists (Database& );
+void CreateJobsListTable(Database& );
+void InsertJobToDatabase(Database& , string& , string&, string& ,string& , string& ,string& ,string& , string& );
+void PostJob(Database&, string& );
+void FetchAllJobs(Database&, string&);
+
 void printCandidateResume(Database& ,string&);
+void SendInterviewInvitation(Database&,string&);
+string FetchJobsEmployee(Database&, string&);
+bool printPendingCandidates(Database&,string &);
+
 bool InterviewInvitationsExist(Database&);
-void CreateInterviewInvitationTable(Database& );
-bool printPendingCandidates(Database&db,string &job_idSelected);
-string FetchJobsEmployee(Database&,string&);
-void insertToInterviewInvitationtable(Database&db,string&candidate_id,string&job_id);
+void CreateInterviewInvitationTable(Database&);
+void insertToInterviewInvitationtable(Database&,string&,string&,string&);
+void ViewAllInterviewInvitation(Database&,string&);
 #endif //xMAIN_CPP_EMPLOYER_H

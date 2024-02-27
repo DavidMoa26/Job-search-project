@@ -1,6 +1,6 @@
 #include "employer.h"
 #include "authentication.h"
-#include "iomanip"
+
 enum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3};
 
 string SelectScope(){
@@ -170,6 +170,7 @@ void CreateInterviewInvitationTable(Database& db)
 {
     try {
         db.exec("CREATE TABLE IF NOT EXISTS Interview_invitations ("
+                "employee_id TEXT NOT NULL,"
                 "candidate_id TEXT NOT NULL,"
                 "job_id TEXT NOT NULL"
                 ");");
@@ -235,14 +236,14 @@ void SendInterviewInvitation(Database&db,string&id)
             status = "accepted";
             if(!InterviewInvitationsExist(db))
                 CreateInterviewInvitationTable(db);
-            insertToInterviewInvitationtable(db,select_id,job_idSelected);
+            insertToInterviewInvitationtable(db,select_id,job_idSelected,id);
         }
         else if (choice == 'r')
         {
             status = "rejected";
             if(!InterviewInvitationsExist(db))
                 CreateInterviewInvitationTable(db);
-            insertToInterviewInvitationtable(db,select_id,job_idSelected);
+            insertToInterviewInvitationtable(db,select_id,job_idSelected,id);
         }
         else if (choice == 'b')
         {
@@ -268,22 +269,25 @@ void SendInterviewInvitation(Database&db,string&id)
     }
 
 }
-void ViewAllInterviewInvitation(Database&db)
-{
+void ViewAllInterviewInvitation(Database& db, string&employee_id) {
     try {
-        // Select all data from Interview_invitations table
-        Statement selectQuery(db, "SELECT * FROM Interview_invitations;");
+        // Select data from Interview_invitations table where candidate_id matches the provided employee_id
+        Statement selectQuery(db, "SELECT * FROM Interview_invitations WHERE candidate_id = ?;");
+
+        // Bind the employee_id parameter
+        selectQuery.bind(1, employee_id);
+
+        // Execute the query
         while (selectQuery.executeStep()) {
-            string candidate_id = selectQuery.getColumn(0).getText(); // Assuming candidate_id is the first column
-            string job_id = selectQuery.getColumn(1).getText(); // Assuming job_name is the second column
+            string job_id = selectQuery.getColumn(1).getText(); // Assuming job_id is the second column
 
             // Print the data
-            cout << "Candidate ID: " << candidate_id << ", Job_id: " << job_id << endl;
+            cout << "Candidate ID: " << employee_id << ", Job_id: " << job_id << endl;
             // Add more columns as needed
         }
     } catch(const exception& e) {
         cerr << "SQLite exception: " << e.what() << endl;
-        }
+    }
 }
 string FetchJobsEmployee(Database& db, string& id) {
     try {
@@ -368,12 +372,13 @@ bool printPendingCandidates(Database&db,string &job_idSelected)
     }
     return true;
 }
-void insertToInterviewInvitationtable(Database&db,string&candidate_id,string&job_id)
+void insertToInterviewInvitationtable(Database&db,string&candidate_id,string&job_id,string&employee_id)
 {
         try {
-            Statement query(db, "INSERT INTO Interview_invitations (candidate_id, job_id) VALUES (?, ?)");
-            query.bind(1, candidate_id);
-            query.bind(2, job_id);
+            Statement query(db, "INSERT INTO Interview_invitations (employee_id candidate_id, job_id) VALUES (? ,?, ?)");
+            query.bind(1, employee_id);
+            query.bind(2, candidate_id);
+            query.bind(3, job_id);
             query.exec();
             cout << "Interview invitation inserted successfully.\n";
         } catch (const exception& e) {

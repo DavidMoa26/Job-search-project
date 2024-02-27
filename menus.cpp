@@ -54,7 +54,6 @@ void CandidateMenu(Database& db , string& id) {
             case EDIT_PROFILE:
                 break;
             case VIEW_INTERVIEW_INVITATIONS:
-                viewInterviewInvitations(db,id);
                 break;
             case LOG_OUT_C:
                 flagForContinue = true;
@@ -87,13 +86,12 @@ void EmployerMenu(Database& db, string& id) {
                 FetchAllJobs(db,id);
                 break;
             case VIEW_CANDIDATES_PROFILES:
-                ViewAllSubResumeProfiles(db);
                 break;
             case SEND_INVITATION:
                 SendInterviewInvitation(db,id);
                 break;
             case VIEW_INVITATION:
-                ViewAllInterviewInvitation(db);
+                ViewAllInterviewInvitation(db,id);
                 break;
             case LOG_OUT_E:
                 flagForContinue = true;
@@ -151,6 +149,6 @@ void MainMenu(Database& db)
 
             default:
                 cout << "You enter an illegal option, please try again!" << endl;
-                }
         }
+    }
 }
