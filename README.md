@@ -1,4 +1,4 @@
-# Project Title
+# Job Search Project
 
 The project is a C++ application designed to facilitate job searching and using SQLite database to store application data.
 
