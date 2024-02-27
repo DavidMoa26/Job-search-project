@@ -1,7 +1,6 @@
 //
 // Created by david on 22/02/2024.
 //
-<<<<<<< HEAD
 #include <windows.h>
 #include <SQLiteCpp/SQLiteCpp.h>
 #include "iostream"
@@ -24,7 +23,7 @@ void ChangeColor(int color)
     SetConsoleTextAttribute(console_color, color);//Using a function from the library windows.h which changes the output below it.
 }
 void printLine(int width, char borderChar, char fillChar) {
-cout << setfill(borderChar) << setw(width) << borderChar << endl;
+    cout << setfill(borderChar) << setw(width) << borderChar << endl;
 }
 void printRow(string text, int width, char borderChar)
 {
@@ -40,21 +39,6 @@ void ViewAllJobs(Database& db)
     {
         cout << "JobsList table does not exist.\n";
         return;
-=======
-#include <SQLiteCpp/SQLiteCpp.h>
-#include "iostream"
-#include <string>
-#include "employer.h"
-#include "candidate.h"
-
-using namespace std;
-bool ViewAllJobs(Database& db, string& id)
-{
-    if (!JobsListExists(db))
-    {
-        cout << "Users table does not exist.\n";
-        return false;
->>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
     }
     try {
         Statement query(db, "SELECT * FROM jobs_list");
@@ -68,34 +52,19 @@ bool ViewAllJobs(Database& db, string& id)
                 string position = query.getColumn(4).getText();
                 string scope = query.getColumn(6).getText();
                 string experience = query.getColumn(7).getText();
-<<<<<<< HEAD
                 PrintJob(jobId, companyName, location, position, scope, experience);
             }
-=======
-
-                cout << " ---------------------------------" << endl;
-                cout << jobId << "." << endl
-                     << "   Company: " << companyName  << endl
-                     << "   Position: " << position  << endl
-                     << "   Location: " << location  << endl
-                     << "   Scope: " << scope  << endl
-                     << "   Experience years: " << experience  << endl;
-            }
-            cout << " ---------------------------------" << endl;
-            return true;
->>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
         }
         else
         {
             cout << "No jobs found.\n";
-<<<<<<< HEAD
             return;
         }
     }
-        catch(exception & e)
-        {
-            cerr << "SQLite exception: " << e.what() << endl;
-        }
+    catch(exception & e)
+    {
+        cerr << "SQLite exception: " << e.what() << endl;
+    }
 }
 string SelectJob(Database& db, string& id)
 {
@@ -105,24 +74,6 @@ string SelectJob(Database& db, string& id)
     getline(cin, choice);
     if (choice == "b")
         return "b";
-=======
-            return false;
-        }
-    }
-    catch(exception & e)
-    {
-        cerr << "SQLite exception: " << e.what() << endl;
-        return false;
-    }
-}
-void SelectJob(Database& db)
-{
-    string choice;
-    cout << "Select a job - press its number   |   Back - press 'b'." << endl;
-    cin >> choice;
-    if (choice == "b")
-        return;
->>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
     try {
         Statement query(db, "SELECT * FROM jobs_list WHERE id = ?");
         query.bind(1, stoi(choice));
@@ -132,7 +83,6 @@ void SelectJob(Database& db)
             if (jobId == choice)
             {
                 string companyName = query.getColumn(2).getText();
-<<<<<<< HEAD
                 string location = query.getColumn(3).getText();
                 string position = query.getColumn(4).getText();
                 string description = query.getColumn(5).getText();
@@ -151,7 +101,7 @@ void SelectJob(Database& db)
                 printRow("Salary: " + salary, WIDTH, BORDER_CHAR);
                 printLine(WIDTH, FILL_CHAR, BORDER_CHAR);
                 return jobId;
-                }
+            }
         } else {
             cout << "No jobs found.\n";
             return "ERROR";
@@ -513,11 +463,11 @@ void InsertSubmitToTable(Database& db, string& candidate_id, string& jobId)
             }
         }
         else
-            {
+        {
             string choice;
             cout << "You didn't create a resume!" << endl;
             CreateResume(db, candidate_id);
-            }
+        }
 
     } catch (const exception& e) {
         cerr << "SQLite exception: " << e.what() << endl;
@@ -574,16 +524,4 @@ void ViewAllSubmittedJobs(Database& db, string& candidate_id)
     {
         cerr << "SQLite exception: " << e.what() << endl;
     }
-=======
-                string position = query.getColumn(4).getText();
-                string description = query.getColumn(5).getText();
-                cout << "Job ID: " << jobId << ", Company: " << companyName << ", Position: " << "Description: " << description <<  endl;
-            }
-        } else {
-            cout << "No jobs found.\n";
-        }
-    } catch(exception& e) {
-        cerr << "SQLite exception: " << e.what() << endl;
-        }
->>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
 }

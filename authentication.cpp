@@ -1,11 +1,7 @@
 #include <SQLiteCpp/SQLiteCpp.h>
 #include "iostream"
 #include <string>
-<<<<<<< HEAD
-#include <tuple>
-=======
 
->>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
 enum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3,QUESTION_4,QUESTION_5,GO_BACK};
 #define MAX_PASSWORD_SIZE 12
 #define MIN_PASSWORD_SIZE 6
@@ -15,8 +11,10 @@ enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW
 enum {COUNT_FEEDBACK = 0,COUNT_FEEDBACK1,COUNT_FEEDBACK2,COUNT_FEEDBACK3};
 #define ID_VALID 9
 
+
 using namespace SQLite;
 using namespace std;
+
 //Validation of fields
 bool CheckIdLength(string &id) {
     return id.length() == 9;
@@ -100,15 +98,7 @@ bool validFreeText(string &freeText)
         return false;
     }
 
-<<<<<<< HEAD
-    int categoriesMet = 0;
-    if (lowercaseCount > 0) ++categoriesMet;
-    if (uppercaseCount > 0) ++categoriesMet;
-    if (digitCount > 0)++categoriesMet;
-    if (specialCharCount > 0) ++categoriesMet;
-=======
     return true;
->>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
 
 }
 bool passwordDifficulty(string&password,char &get_out)
@@ -119,12 +109,6 @@ bool passwordDifficulty(string&password,char &get_out)
     bool uppercase = false;
     int counter = 0;
 
-<<<<<<< HEAD
-bool ValidateFreeText(string &freeText)
-{
-    return freeText.length() > 200 ;
-}
-=======
     for (int i=0;i < password.length();++i)
     {
         if((password[i] >= 33 && password[i] <= 47)||(password[i] >=58 && password[i] <= 64)||(password[i] >=91 && password[i] <= 96) )
@@ -211,7 +195,6 @@ bool selectQuestion(string &question, string &answer ,char &get_out)
 
 }
 
->>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
 //Validation of tables
 bool UsersTableExists(Database& db) {
     try {
@@ -342,45 +325,8 @@ bool InsertUserToDatabase(Database& db, string& id, string& password, string& na
     }
 }
 void Register (Database& db) {
-<<<<<<< HEAD
-    string id, password, name, age,role,question, answer, freeText;
-    cout << "Enter Your ID (must be 9 digits).\n";
-    cin.ignore();
-    getline(cin, id);
-    while (!CheckIdLength(id) || !CheckIfIdIsDigits(id)) {
-        cout << "Invalid ID. ID must be exactly 9 digits long and contains only numbers. Please try again:\n";
-        getline(cin, id);
-    }
-    cout << "Enter Your password (must be between 6-12 digits,must contains lowercase,uppercase,numbers).\n";
-    cin >> password;
-    while (!ValidatePassword(password)) {
-        cout << "Invalid Password. Must be 6-12 digits,must contains lowercase,uppercase,numbers. Please try again:\n";
-        cin >> password;
-    }
-    cout << "Enter Your name (only letters).\n";
-    cin >> name;
-    while (!ValidateName(name)) {
-        cout << "Invalid name - must contain only letters:\n";
-        cin >> name;
-    }
-    cout << "Enter Your age (only numbers 18-99).\n";
-    cin >> age;
-    while (!ValidateAge(age)) {
-        cout << "Invalid age - must contain numbers between 18-99:\n";
-        cin >> age;
-    }
-    while (!ValidateAge(freeText)) {
-        cout << "Invalid free text - must contain characters between 0-200:\n";
-        cin >> freeText;
-    }
-    role = SelectCandidateOrEmployer();
-    question = SelectForgotPasswordQuestion();
-    cout << "Enter Your answer :\n";
-    cin >> answer;
-=======
     string id, password, name, age,role,question, answer,freetext;
     char get_out;
->>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
     if(!UsersTableExists(db))
         CreateUsersTable(db);
     cout << "Dear user, please enter your details to sign up.\n";
@@ -473,17 +419,11 @@ void Register (Database& db) {
     InsertForgotPasswordDetailsToDatabase(db,id,question,answer);
 }
 string Login (Database& db) {
-<<<<<<< HEAD
-    if (!UsersTableExists(db))
-    {
-        cout << "Users table does not exist.\n";
-=======
 
     char get_out;
 
     if (!UsersTableExists(db)) {
         cout << "users not exist.\n";
->>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
         return "ERROR";
     }
     try {

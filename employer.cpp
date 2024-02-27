@@ -125,29 +125,22 @@ void PostJob(Database& db, string& id) {
         CreateJobsListTable(db);
     InsertJobToDatabase(db,id,companyName,location,position,description,scope,experience,salary);
 }
-void FetchAllJobs(Database& db, string& id)
-{
-    if (!JobsListExists(db))
-    {
+void FetchAllJobs(Database& db, string& id) {
+    if (!JobsListExists(db)) {
         cout << "jobs_list table does not exist.\n";
         return;
     }
     try {
         Statement query(db, "SELECT * FROM jobs_list WHERE employer_id = ?");
-<<<<<<< HEAD
-        //query.bind(1, stoi(id));
-        if (query.executeStep()) {
-=======
         query.bind(1, stoi(id));
 
         // Loop through each row in the result set
         while (query.executeStep()) {
->>>>>>> b33e9a15ab5f96340d8258c7333df68ec46262d4
             int jobId = query.getColumn(0).getInt();
             string companyName = query.getColumn(2).getText();
             string position = query.getColumn(4).getText();
             string description = query.getColumn(5).getText();
-            cout << "Job ID: " << jobId << ", Company: " << companyName << ", Position: " << position << ", Description: " << description <<  endl;
+            cout << "Job ID: " << jobId << ", Company: " << companyName <<  endl;
         }
 
         if (query.getColumn(0).getInt() == 0) {
@@ -156,8 +149,9 @@ void FetchAllJobs(Database& db, string& id)
 
     } catch(exception& e) {
         cerr << "SQLite exception: " << e.what() << endl;
-    }
+        }
 }
+
 bool InterviewInvitationsExist(Database&db)
 {
     try {
