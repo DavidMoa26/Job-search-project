@@ -42,8 +42,7 @@ void ViewAllJobs(Database& db)
     }
     try {
         Statement query(db, "SELECT * FROM jobs_list");
-        if(query.executeStep())
-        {
+
             while (query.executeStep())
             {
                 string jobId = query.getColumn(0).getText();
@@ -55,12 +54,6 @@ void ViewAllJobs(Database& db)
                 PrintJob(jobId, companyName, location, position, scope, experience);
             }
         }
-        else
-        {
-            cout << "No jobs found.\n";
-            return;
-        }
-    }
     catch(exception & e)
     {
         cerr << "SQLite exception: " << e.what() << endl;

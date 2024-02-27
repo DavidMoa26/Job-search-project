@@ -10,9 +10,8 @@ using namespace std;
 
 enum SearchMenu{VIEW_ALL_JOBS = '1', SEARCH_BY_CATEGORY, BACK_TO_CANDIDATE_MENU};
 enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};
-enum EmployerMenu{PUBLISH_JOB = '1',DELETE_JOB,EDIT_JOB, VIEW_ALL_JOBS_YOU_PUBLISHED, VIEW_CANDIDATES_PROFILES,SEND_INVITATION,VIEW_INVITATION,FILTER, LOG_OUT_E};
+enum EmployerMenu{PUBLISH_JOB = '1',DELETE_JOB,EDIT_JOB, VIEW_ALL_JOBS_YOU_PUBLISHED, SEND_QUESTION,FILTER,SEND_INVITATION,VIEW_INVITATION, LOG_OUT_E};
 enum MainMenu{REGISTER = '1', LOGIN,FORGOT_PASSWORD,EXIT};
-
 
 
 void CandidateMenu(Database& db , string& id)
@@ -62,12 +61,11 @@ void EmployerMenu(Database& db, string& id) {
                 "3. Edit a job.\n"
                 "4. View all the jobs you have already published.\n"
                 "5. Send question for candidate to test him .\n"
-                "6. Send an invitation to a candidate the submitted their resume.\n"
-                "7. View all the interview invitations the employer has send\n"
+                "6. Filter job for minimum years of experience..\n"
+                "7. Send an invitation to a candidate the submitted their resume\n"
                 "8. View all the interview invitations the employer has send\n"
                 "9. Log out. \n"
                 "Please enter your choice!\n";
-        cin >> option;
 
         switch (option)
         {
@@ -83,16 +81,16 @@ void EmployerMenu(Database& db, string& id) {
             case VIEW_ALL_JOBS_YOU_PUBLISHED:
                 FetchAllJobs(db,id);
                 break;
-            case VIEW_CANDIDATES_PROFILES:
+            case SEND_QUESTION:
+                break;
+            case FILTER:
+                FillterCandidateResume(db,id);
                 break;
             case SEND_INVITATION:
                 SendInterviewInvitation(db,id);
                 break;
             case VIEW_INVITATION:
                 ViewAllInterviewInvitation(db,id);
-                break;
-            case FILTER:
-//                Create function to filter candidate by experience
                 break;
             case LOG_OUT_E:
                 flagForContinue = true;

@@ -24,4 +24,5 @@ void ViewAllInterviewInvitation(Database& db, string&employee_id);
 string FetchJobsEmployee(Database& db, string& id);
 bool printPendingCandidates(Database&db,string &job_idSelected);
 void insertToInterviewInvitationtable(Database&db,string&candidate_id,string&job_id,string&employee_id);
+void FillterCandidateResume(Database&db,string&id);
 #endif //xMAIN_CPP_EMPLOYER_H

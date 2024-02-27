@@ -469,8 +469,12 @@ string FetchJobsEmployee(Database& db, string& id) {
     }
 
     string job_id;
-    cout << "Enter Job id to see all the submissions to the job:\n ";
+    cout << "Enter Job id to see all the submissions to the job  or enter 'B' to go back:\n ";
     cin >> job_id;
+    if(job_id == "B")
+    {
+        return "B";
+    }
     return job_id;
 }
 bool printPendingCandidates(Database&db,string &job_idSelected)
@@ -543,3 +547,58 @@ void insertToInterviewInvitationtable(Database&db,string&candidate_id,string&job
             cerr << "SQLite exception: " << e.what() << endl;
         }
 }
+void FillterCandidateResume(Database& db, string& id) {
+
+    while (true)
+    {
+        int count = 0;
+        string job_idSelected;
+        job_idSelected = FetchJobsEmployee(db, id); // Assuming FetchJobsEmployee returns the job_id
+        if(job_idSelected == "B")
+            return;
+        if (!printPendingCandidates(db, job_idSelected))
+            return;
+        string MinYearsExp;
+        cout << "Enter minimum years of experience you want to see in the candidate resume, or enter 'B' to go back:\n ";
+        cin >> MinYearsExp;
+
+        if (MinYearsExp == "B" || MinYearsExp == "b") {
+            break;
+        }
+
+        try {
+            // Select all resumes
+            Statement selectQuery(db, "SELECT * FROM resumes;");
+
+            // Execute the query
+            while (selectQuery.executeStep()) {
+                string candidate_id = selectQuery.getColumn(0).getText(); // Assuming candidate_id is the first column
+                string full_name = selectQuery.getColumn(1).getText(); // Assuming full_name is the second column
+                int age = selectQuery.getColumn(2).getInt(); // Assuming age is the third column
+                string degree1 = selectQuery.getColumn(3).getText(); // Assuming degree1 is the fourth column
+                string degree2 = selectQuery.getColumn(4).getText(); // Assuming degree2 is the fifth column
+                string degree3 = selectQuery.getColumn(5).getText(); // Assuming degree3 is the sixth column
+                string work_experience = selectQuery.getColumn(6).getText(); // Assuming work_experience is the seventh column
+                int years_of_experience = selectQuery.getColumn(7).getInt(); // Assuming years_of_experience is the eighth column
+
+                // Check if the candidate meets the minimum years of experience requirement
+                if (years_of_experience >= stoi(MinYearsExp)) {
+                    // Print the resume data
+                    cout << "Candidate ID: " << candidate_id << endl;
+                    cout << "Full Name: " << full_name << endl;
+                    cout << "Age: " << age << endl;
+                    cout << "Degrees: " << degree1 << " " << degree2 << "  " << degree3 << endl;
+                    cout << "Work Experience: " << work_experience << endl;
+                    cout << "Years of Experience: " << years_of_experience << endl;
+                    cout << "---------------------------------------------" << endl;
+                    ++count;
+                }
+            }
+        } catch (const exception& e) {
+            cerr << "SQLite exception: " << e.what() << endl;
+        }
+        if(count == 0)
+            cout << "no resume found with that given of minimum years of experience.\n";
+    }
+}
+
