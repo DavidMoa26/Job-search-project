@@ -24,7 +24,7 @@ add_executable(
         menus.cpp
         candidate.cpp
         employer.cpp
-        tests/main.cpp
+        employer.h
         candidate.h)
 
 # Link against SQLiteCpp (and sqlite3 if necessary)
