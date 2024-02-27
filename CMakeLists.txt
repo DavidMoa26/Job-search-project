@@ -9,12 +9,6 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/SQLiteCpp)
 
 
 
-# Add Google Test
-
-
-# Add Google Test
-add_subdirectory(googletest)
-
 
 # Define the executable for your main application
 add_executable(

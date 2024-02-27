@@ -1,12 +1,5 @@
-#include <iostream>
-
-#include "authentication.h"
-#include "menus.h"
-#include "candidate.h"
-#include "employer.h"
-#include "sqlite3.h"
 enum ConsoleColor
-        {
+{
     FOREGROUND_BLUE      = 0x0001,
     FOREGROUND_GREEN     = 0x0002,
     FOREGROUND_RED       = 0x0004,
@@ -17,9 +10,14 @@ enum ConsoleColor
     BACKGROUND_INTENSITY = 0x0080
 };
 
-#include <SQLiteCpp/SQLiteCpp.h>
+#include <iostream>
+#include "authentication.h"
 #include "menus.h"
+#include "candidate.h"
 #include "employer.h"
+#include <SQLiteCpp/SQLiteCpp.h>
+
+
 using namespace std;
 using namespace SQLite;
 

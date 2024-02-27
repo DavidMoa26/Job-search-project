@@ -13,29 +13,10 @@ using namespace std;
 
 enum SearchMenu{VIEW_ALL_JOBS = '1', SEARCH_BY_CATEGORY, BACK_TO_CANDIDATE_MENU};
 enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};
-enum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS_YOU_PUBLISHED, VIEW_CANDIDATES_PROFILES,SEND_INVITATION,VIEW_INVITATION, LOG_OUT_E};
-
-
-
-
+enum EmployerMenu{PUBLISH_JOB = '1',DELETE_JOB,EDIT_JOB, VIEW_ALL_JOBS_YOU_PUBLISHED, VIEW_CANDIDATES_PROFILES,SEND_INVITATION,VIEW_INVITATION, LOG_OUT_E};
 enum MainMenu{REGISTER = '1', LOGIN,FORGOT_PASSWORD,EXIT};
 
-void EditDeleteMenu() {
-    string choice, id;
-    cout << "Please enter your choice : \n"
-            "1. Edit jobs.\n"
-            "2. Delete Jobs.\n"
-            "Back - press any char";
-    cin >> choice;
-    if(choice == "1"){
-        cout << "Please enter job id : \n";
-        cin >> id;
-    }
-    if(choice == "2"){
-        cout << "Please enter job id : \n";
-        cin >> id;
-    }
-};
+
 
 void CandidateMenu(Database& db , string& id)
 {
@@ -80,11 +61,13 @@ void EmployerMenu(Database& db, string& id) {
     while (!flagForContinue)
     {
         cout << "1. Publish a job.\n"
-                "2. View all the jobs you have already published.\n"
-                "3. View all the candidates who submitted their resumes for the jobs you published .\n"
-                "4. Send an invitation to a candidate the submitted their resume.\n"
-                "5. View all the interview invitations the employer has send\n"
-                "6. Log out. \n"
+                "2. Delete a job.\n"
+                "3. Edit a job.\n"
+                "4. View all the jobs you have already published.\n"
+                "5. Send question for candidate to test him .\n"
+                "6. Send an invitation to a candidate the submitted their resume.\n"
+                "7. View all the interview invitations the employer has send\n"
+                "8. Log out. \n"
                 "Please enter your choice!\n";
         cin >> option;
 
@@ -92,6 +75,12 @@ void EmployerMenu(Database& db, string& id) {
         {
             case PUBLISH_JOB:
                 PostJob(db,id);
+                break;
+            case DELETE_JOB:
+                DeleteJob(db,id);
+                break;
+            case EDIT_JOB:
+                EditJob(db,id);
                 break;
             case VIEW_ALL_JOBS_YOU_PUBLISHED:
                 FetchAllJobs(db,id);

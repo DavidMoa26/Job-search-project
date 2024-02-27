@@ -8,11 +8,14 @@ using namespace std;
 using namespace SQLite;
 
 string SelectScope();
+string SelectFieldToEdit();
 bool JobsListExists (Database&);
 void CreateJobsListTable(Database&);
 void PostJob(Database&, string&);
 void InsertJobToDatabase(Database& , string& , string& ,string&, string&, string&, string& , string&, string&);
 void FetchAllJobs(Database& , string&);
+void DeleteJob(Database& , string&);
+void EditJob(Database& , string&);
 bool InterviewInvitationsExist(Database&db);
 void CreateInterviewInvitationTable(Database& db);
 void printCandidateResume(Database&db ,string&selected_candidate_id);

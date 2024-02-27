@@ -413,7 +413,7 @@ int SelectDegree(){
 // Resume submissions
 bool ResumeSubmissionsTableExists(Database& db) {
     try {
-        Statement query(db, "SELECT name FROM sqlite_master WHERE type='table' AND name='resume_submissions';");
+        Statement query(db, "SELECT name FROM sqlite_master WHERE type='table' AND name='submission';");
         // Execute the query
         if (query.executeStep()) {
             return true;
@@ -427,12 +427,13 @@ bool ResumeSubmissionsTableExists(Database& db) {
 }
 void CreateResumeSubmissionsTable(Database& db) {
     try {
-        db.exec("CREATE TABLE IF NOT EXISTS resume_submissions ("
-                "job_id INTEGER PRIMARY KEY UNIQUE,"
+        db.exec("CREATE TABLE IF NOT EXISTS submission ("
+                "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                "job_id INTEGER,"
                 "candidate_id INTEGER NOT NULL,"
-                "employer_id INTEGER NOT NULL,"
-                "FOREIGN KEY(candidate_id) REFERENCES candidates(id),"
-                "FOREIGN KEY(employer_id) REFERENCES employers(id));");
+                "status TEXT DEFAULT 'pending',"
+                "FOREIGN KEY(job_id) REFERENCES jobs_list(id),"
+                "FOREIGN KEY(candidate_id) REFERENCES users(id));");
         cout << "resume_submissions table created.\n";
     } catch (const exception& e) {
         cerr << "SQLite exception: " << e.what() << endl;
@@ -440,6 +441,9 @@ void CreateResumeSubmissionsTable(Database& db) {
 }
 void InsertSubmitToTable(Database& db, string& candidate_id, string& jobId)
 {
+    if(!ResumeSubmissionsTableExists(db)) {
+        CreateResumeSubmissionsTable(db);
+    }
     try {
         // Prepare a SQL insert statement
         Statement query1(db, "SELECT * FROM jobs_list WHERE id = ?" );
@@ -451,12 +455,11 @@ void InsertSubmitToTable(Database& db, string& candidate_id, string& jobId)
             if (query1.executeStep())
             {
                 string employerId = query1.getColumn(1).getText();
-                Statement query3(db, "INSERT INTO resume_submissions (job_id, candidate_id, employer_id) VALUES (?,?,?);");
+                Statement query3(db, "INSERT INTO submission (job_id, candidate_id) VALUES (?,?);");
 
                 // Bind values to the statement
                 query3.bind(1, stoi(jobId));
                 query3.bind(2, stoi(candidate_id));
-                query3.bind(3, employerId);
 
                 // Execute the statement
                 query3.exec();
