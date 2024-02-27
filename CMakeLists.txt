@@ -6,11 +6,9 @@ set(CMAKE_CXX_STANDARD 14)
 # Add the SQLiteCpp directory to the build
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/SQLiteCpp)
 
-add_subdirectory(tests)
 
 
 # Add Google Test
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/googletest googletest)
 
 # Define the executable for your main application
 add_executable(

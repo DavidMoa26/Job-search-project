@@ -10,5 +10,5 @@ void EditDeleteMenu();
 void MainMenu(Database&);
 void CandidateMenu(Database& , string&);
 void EmployerMenu(Database& , string&);
-
+void LookForJobsMenu(Database&, string&);
 #endif //MAIN_CPP_MENUS_H

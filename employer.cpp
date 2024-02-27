@@ -34,7 +34,7 @@ bool JobsListExists (Database& db) {
             return false;
         }
     } catch (const exception& e) {
-        cerr << "SQLite exception: " << e.what() << std::endl;
+        cerr << "SQLite exception: " << e.what() << endl;
     }
     return false;
 }
@@ -125,14 +125,16 @@ void PostJob(Database& db, string& id) {
         CreateJobsListTable(db);
     InsertJobToDatabase(db,id,companyName,location,position,description,scope,experience,salary);
 }
-void FetchAllJobs(Database& db, string& id) {
-    if (!JobsListExists(db)) {
+void FetchAllJobs(Database& db, string& id)
+{
+    if (!JobsListExists(db))
+    {
         cout << "jobs_list table does not exist.\n";
         return;
     }
     try {
         Statement query(db, "SELECT * FROM jobs_list WHERE employer_id = ?");
-        query.bind(1, stoi(id));
+        //query.bind(1, stoi(id));
         if (query.executeStep()) {
             int jobId = query.getColumn(0).getInt();
             string companyName = query.getColumn(2).getText();

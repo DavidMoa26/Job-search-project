@@ -2,15 +2,12 @@
 #include "iostream"
 #include <string>
 #include <tuple>
-
 enum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3,QUESTION_4,QUESTION_5,GO_BACK};
 
 #define ID_VALID 9
 
-
 using namespace SQLite;
 using namespace std;
-
 //Validation of fields
 bool CheckIdLength(string &id) {
     return id.length() == 9;
@@ -73,13 +70,16 @@ bool ValidatePassword(string &password) {
     int categoriesMet = 0;
     if (lowercaseCount > 0) ++categoriesMet;
     if (uppercaseCount > 0) ++categoriesMet;
-    if (digitCount > 0) ++categoriesMet;
+    if (digitCount > 0)++categoriesMet;
     if (specialCharCount > 0) ++categoriesMet;
 
     return categoriesMet >= 3;
 }
 
-
+bool ValidateFreeText(string &freeText)
+{
+    return freeText.length() > 200 ;
+}
 //Validation of tables
 bool UsersTableExists(Database& db) {
     try {
@@ -235,12 +235,13 @@ bool InsertUserToDatabase(Database& db, string& id, string& password, string& na
     }
 }
 void Register (Database& db) {
-    string id, password, name, age,role,question, answer;
+    string id, password, name, age,role,question, answer, freeText;
     cout << "Enter Your ID (must be 9 digits).\n";
-    cin >> id;
+    cin.ignore();
+    getline(cin, id);
     while (!CheckIdLength(id) || !CheckIfIdIsDigits(id)) {
         cout << "Invalid ID. ID must be exactly 9 digits long and contains only numbers. Please try again:\n";
-        cin >> id;
+        getline(cin, id);
     }
     cout << "Enter Your password (must be between 6-12 digits,must contains lowercase,uppercase,numbers).\n";
     cin >> password;
@@ -260,6 +261,10 @@ void Register (Database& db) {
         cout << "Invalid age - must contain numbers between 18-99:\n";
         cin >> age;
     }
+    while (!ValidateAge(freeText)) {
+        cout << "Invalid free text - must contain characters between 0-200:\n";
+        cin >> freeText;
+    }
     role = SelectCandidateOrEmployer();
     question = SelectForgotPasswordQuestion();
     cout << "Enter Your answer :\n";
@@ -272,7 +277,8 @@ void Register (Database& db) {
     InsertForgotPasswordDetailsToDatabase(db,id,question,answer);
 }
 string Login (Database& db) {
-    if (!UsersTableExists(db)) {
+    if (!UsersTableExists(db))
+    {
         cout << "Users table does not exist.\n";
         return "ERROR";
     }

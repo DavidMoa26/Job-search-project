@@ -1,16 +1,15 @@
 #include "menus.h"
 #include "authentication.h"
 #include "employer.h"
-
+#include "candidate.h"
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <string>
 #include "iostream"
-
 using namespace SQLite;
 using namespace std;
-
+enum SearchMenu{VIEW_ALL_JOBS = '1', SEARCH_BY_CATEGORY, BACK_TO_CANDIDATE_MENU};
 enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};
-enum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS, VIEW_CANDIDATES_PROFILES, LOG_OUT_E};
+enum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS_YOU_PUBLISHED, VIEW_CANDIDATES_PROFILES, LOG_OUT_E};
 enum MainMenu{REGISTER = '1', LOGIN,FORGOT_PASSWORD,EXIT};
 
 void EditDeleteMenu() {
@@ -32,10 +31,9 @@ void EditDeleteMenu() {
 
 void CandidateMenu(Database& db , string& id) {
     char option;
-    bool flagForContinue = false;
-    while (!flagForContinue) {
+    while (true) {
         cout << "1. Look for jobs.\n"
-                "2. Create your resume\n"
+                "2. Create your resume.\n"
                 "3. View all the jobs you submitted your resume.\n"
                 "4. View all the interview invitations you got.\n"
                 "5. Edit your profile.\n"
@@ -44,18 +42,20 @@ void CandidateMenu(Database& db , string& id) {
         cin >> option;
         switch (option) {
             case LOOK_FOR_JOBS:
+                LookForJobsMenu(db, id);
                 break;
             case CREATE_RESUME:
+                CreateResume(db, id);
                 break;
             case VIEW_JOBS_SUBMITTED:
+                ViewAllSubmittedJobs(db, id);
                 break;
             case VIEW_INTERVIEW_INVITATIONS:
                 break;
             case EDIT_PROFILE:
                 break;
             case LOG_OUT_C:
-                flagForContinue = true;
-                break;
+                return;
             default:
                 cout << "You enter an illegal option, please try again!" << endl;
         }
@@ -77,7 +77,7 @@ void EmployerMenu(Database& db, string& id) {
             case PUBLISH_JOB:
                 PostJob(db,id);
                 break;
-            case VIEW_ALL_JOBS:
+            case VIEW_ALL_JOBS_YOU_PUBLISHED:
                 FetchAllJobs(db,id);
                 break;
             case VIEW_CANDIDATES_PROFILES:
@@ -114,8 +114,8 @@ void MainMenu(Database& db)
             case LOGIN:
             {
                 string result = Login(db);
-                while(result == "ERROR")
-                    result = Login(db);
+                if (result == "ERROR")
+                    break;
                 string role = GetUserRole(db,result);
                 if(role == "employer")
                     EmployerMenu(db,result);
@@ -134,6 +134,34 @@ void MainMenu(Database& db)
                 break;
             }
 
+            default:
+                cout << "You enter an illegal option, please try again!" << endl;
+        }
+    }
+}
+void LookForJobsMenu(Database& db, string& id)
+{
+    char option;
+    while (true) {
+        cout << "1. View all the jobs.\n"
+                "2. Search by category.\n"
+                "3. Back.\n";
+        cin >> option;
+        switch (option)
+        {
+            case VIEW_ALL_JOBS:
+            {
+                ViewAllJobs(db);
+                string jobId = SelectJob(db, id);
+                if (jobId != "ERROR" && jobId != "b")
+                    SubmitResume(db, id, jobId);
+                break;
+            }
+            case SEARCH_BY_CATEGORY:
+                SearchByCategory(db);
+                break;
+            case BACK_TO_CANDIDATE_MENU:
+                return;
             default:
                 cout << "You enter an illegal option, please try again!" << endl;
         }

@@ -14,6 +14,7 @@ bool CheckIfIdIsDigits(string&);
 bool ValidateName(string&);
 bool ValidateAge(string&);
 bool ValidatePassword(string&);
+bool ValidateFreeText(string &freeText);
 
 //Validation of tables
 bool UsersTableExists(Database&);
