@@ -326,7 +326,8 @@ void CreateResume(Database& db, string& id)
     string full_name, age, degree1, degree2, degree3, work_experience, years_of_experience;
     cout << "Enter your full name : \n";
     cin >> full_name;
-    while(full_name.empty()) {
+    while(full_name.empty())
+    {
         cout << "Full name cannot be empty. Please try again:\n";
         cin >> full_name;
     }
