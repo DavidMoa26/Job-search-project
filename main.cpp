@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SQLiteCpp/SQLiteCpp.h>
 #include "menus.h"
+#include "employer.h"
 
 using namespace std;
 using namespace SQLite;

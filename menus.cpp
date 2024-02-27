@@ -1,6 +1,7 @@
 #include "menus.h"
 #include "authentication.h"
 #include "employer.h"
+#include "candidate.h"
 
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <string>
@@ -9,8 +10,8 @@
 using namespace SQLite;
 using namespace std;
 
-enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};
-enum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS, VIEW_CANDIDATES_PROFILES, LOG_OUT_E};
+enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED,EDIT_PROFILE , VIEW_INTERVIEW_INVITATIONS, LOG_OUT_C};
+enum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS, VIEW_CANDIDATES_PROFILES,SEND_INVITATION,VIEW_INVITATION, LOG_OUT_E};
 enum MainMenu{REGISTER = '1', LOGIN,FORGOT_PASSWORD,EXIT};
 
 void EditDeleteMenu() {
@@ -32,13 +33,14 @@ void EditDeleteMenu() {
 
 void CandidateMenu(Database& db , string& id) {
     char option;
+
     bool flagForContinue = false;
     while (!flagForContinue) {
         cout << "1. Look for jobs.\n"
                 "2. Create your resume\n"
                 "3. View all the jobs you submitted your resume.\n"
-                "4. View all the interview invitations you got.\n"
-                "5. Edit your profile.\n"
+                "4. Edit your profile.\n"
+                "5. View all the interview invitations you got.\n"
                 "6. Log out from the system.\n"
                 "Please enter your choice : \n";
         cin >> option;
@@ -49,9 +51,10 @@ void CandidateMenu(Database& db , string& id) {
                 break;
             case VIEW_JOBS_SUBMITTED:
                 break;
-            case VIEW_INTERVIEW_INVITATIONS:
-                break;
             case EDIT_PROFILE:
+                break;
+            case VIEW_INTERVIEW_INVITATIONS:
+                viewInterviewInvitations(db,id);
                 break;
             case LOG_OUT_C:
                 flagForContinue = true;
@@ -68,10 +71,13 @@ void EmployerMenu(Database& db, string& id) {
     {
         cout << "1. Publish a job.\n"
                 "2. View all the jobs you have already published.\n"
-                "3. View all the candidates who submitted their resumes for the jobs you published.\n"
-                "4. Log out. \n"
+                "3. View all the candidates who submitted their resumes for the jobs you published .\n"
+                "4. Send an invitation to a candidate the submitted their resume.\n"
+                "5. View all the interview invitations the employer has send\n"
+                "6. Log out. \n"
                 "Please enter your choice!\n";
         cin >> option;
+
         switch (option)
         {
             case PUBLISH_JOB:
@@ -81,6 +87,13 @@ void EmployerMenu(Database& db, string& id) {
                 FetchAllJobs(db,id);
                 break;
             case VIEW_CANDIDATES_PROFILES:
+                ViewAllSubResumeProfiles(db);
+                break;
+            case SEND_INVITATION:
+                SendInterviewInvitation(db,id);
+                break;
+            case VIEW_INVITATION:
+                ViewAllInterviewInvitation(db);
                 break;
             case LOG_OUT_E:
                 flagForContinue = true;
@@ -138,6 +151,6 @@ void MainMenu(Database& db)
 
             default:
                 cout << "You enter an illegal option, please try again!" << endl;
+                }
         }
-    }
 }

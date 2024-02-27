@@ -50,34 +50,34 @@ bool validPassword(string &password)
     return true;
 }
 bool validateId(string &id) {
-        if (id.length() == ID_VALID)
+    if (id.length() == ID_VALID)
+    {
+        bool valid = true;
+        for (char c : id)
         {
-            bool valid = true;
-            for (char c : id)
-            {
-                if (c < '0' || c > '9')
-                {
-                    return false;
-                }
-            }
-
-        } else
-            return false;
-    return true;
-}
-bool validateName(string &name) {
-
-        for (char c : name)
-        {
-            if (!isalpha(c))
+            if (c < '0' || c > '9')
             {
                 return false;
             }
         }
-        if (name.length() >= 50)
+
+    } else
+        return false;
+    return true;
+}
+bool validateName(string &name) {
+
+    for (char c : name)
+    {
+        if (!isalpha(c))
         {
             return false;
         }
+    }
+    if (name.length() >= 50)
+    {
+        return false;
+    }
 
     return true;
 }
@@ -93,59 +93,59 @@ bool validateAge(string &age) {
 bool validFreeText(string &freeText)
 {
 
-        if (freeText.length() > 200)
-        {
-            return false;
-        }
+    if (freeText.length() > 200)
+    {
+        return false;
+    }
 
-        return true;
+    return true;
 
 }
 bool passwordDifficulty(string&password,char &get_out)
 {
-        string feedback;
-        bool special_character = false;
-        bool lowercase = false;
-        bool uppercase = false;
-        int counter = 0;
+    string feedback;
+    bool special_character = false;
+    bool lowercase = false;
+    bool uppercase = false;
+    int counter = 0;
 
-        for (int i=0;i < password.length();++i)
+    for (int i=0;i < password.length();++i)
+    {
+        if((password[i] >= 33 && password[i] <= 47)||(password[i] >=58 && password[i] <= 64)||(password[i] >=91 && password[i] <= 96) )
         {
-            if((password[i] >= 33 && password[i] <= 47)||(password[i] >=58 && password[i] <= 64)||(password[i] >=91 && password[i] <= 96) )
-            {
-                if(!special_character)
-                    ++counter;
-                special_character = true;
-            }
-            if(password[i]>=97 && password[i] <= 122)
-            {
-                if(!lowercase)
-                    ++counter;
-                lowercase = true;
-            }
-            if(password[i] >=65 && password[i] <=90)
-            {
-                if(!uppercase)
-                    ++counter;
-                uppercase = true;
-
-            }
+            if(!special_character)
+                ++counter;
+            special_character = true;
+        }
+        if(password[i]>=97 && password[i] <= 122)
+        {
+            if(!lowercase)
+                ++counter;
+            lowercase = true;
+        }
+        if(password[i] >=65 && password[i] <=90)
+        {
+            if(!uppercase)
+                ++counter;
+            uppercase = true;
 
         }
 
+    }
 
-        if (counter == COUNT_FEEDBACK || counter == COUNT_FEEDBACK1)
-            cout << "The password is weak\n";
-        if (counter == COUNT_FEEDBACK2)
-            cout << "The password is medium\n";
-        if (counter == COUNT_FEEDBACK3)
-            cout << "The password is strong\n";
-        cout << "Do you want to change your password?(press 0 for yes/any other character for no/to return to main menu press 1)\n";
-        cin >> get_out;
-        if(get_out == '0')
-            return false;
-        if(get_out == '1')
-            return false;
+
+    if (counter == COUNT_FEEDBACK || counter == COUNT_FEEDBACK1)
+        cout << "The password is weak\n";
+    if (counter == COUNT_FEEDBACK2)
+        cout << "The password is medium\n";
+    if (counter == COUNT_FEEDBACK3)
+        cout << "The password is strong\n";
+    cout << "Do you want to change your password?(press 0 for yes/any other character for no/to return to main menu press 1)\n";
+    cin >> get_out;
+    if(get_out == '0')
+        return false;
+    if(get_out == '1')
+        return false;
     return true;
 
 }
@@ -153,44 +153,44 @@ bool selectQuestion(string &question, string &answer ,char &get_out)
 {
 
 
-        cout << "Please select a number of question:\n";
-        cout << "1. What is the name of your father?\n"
-             << "2. What is the name of your mother?\n"
-             << "3. What is the name of the school you attended?\n"
-             << "4. What year were you born?\n"
-             << "5. What is your favorite food?\n"
-             << "6. Go back to the login/register menu\n";
-        char option;
-        cin >> option;
-        switch (option) {
-            case QUESTION_1:
-                question = "What is the name of your father?";
-                break;
-            case QUESTION_2:
-                question = "What is the name of your mother?";
-                break;
-            case QUESTION_3:
-                question = "What is the name of the school you attended?";
-                break;
-            case QUESTION_4:
-                question = "What year were you born?";
-                break;
-            case QUESTION_5:
-                question = "What is your favorite food?";
-                break;
-            case GO_BACK:
-            {
-                get_out = '0';
-                return false;
-            }
-
-            default:
-                cout << "You entered an illegal option. Please try again!\n";
-                return false;
+    cout << "Please select a number of question:\n";
+    cout << "1. What is the name of your father?\n"
+         << "2. What is the name of your mother?\n"
+         << "3. What is the name of the school you attended?\n"
+         << "4. What year were you born?\n"
+         << "5. What is your favorite food?\n"
+         << "6. Go back to the login/register menu\n";
+    char option;
+    cin >> option;
+    switch (option) {
+        case QUESTION_1:
+            question = "What is the name of your father?";
+            break;
+        case QUESTION_2:
+            question = "What is the name of your mother?";
+            break;
+        case QUESTION_3:
+            question = "What is the name of the school you attended?";
+            break;
+        case QUESTION_4:
+            question = "What year were you born?";
+            break;
+        case QUESTION_5:
+            question = "What is your favorite food?";
+            break;
+        case GO_BACK:
+        {
+            get_out = '0';
+            return false;
         }
-        cout << "Please enter your answer for \"" << question << "\":\n";
-        cin >> answer;
-         return true;
+
+        default:
+            cout << "You entered an illegal option. Please try again!\n";
+            return false;
+    }
+    cout << "Please enter your answer for \"" << question << "\":\n";
+    cin >> answer;
+    return true;
 
 
 }
@@ -331,8 +331,8 @@ void Register (Database& db) {
         CreateUsersTable(db);
     cout << "Dear user, please enter your details to sign up.\n";
     cout << "Please enter your ID (ID must contain 9 digits):\n";
-    cin.ignore();
-    getline(cin,id);
+
+    cin >> id;
     while (!validateId(id))
     {
         cout << "You entered an invalid ID. ID must contain exactly 9 digits. Please try again.\n";
@@ -343,16 +343,14 @@ void Register (Database& db) {
         if (get_out == '0')
             return;
         cout << "Please enter your ID (ID must contain 9 digits):\n";
-        cin.ignore();
-        getline(cin,id);
+        cin >> id;
     }
     cout << "Please enter a password (6 to 12 characters, no spaces).\n"
             "Feedback on password difficulty:\n"
             "- Strong: at least three of lowercase, uppercase, digits, special characters.\n"
             "- Medium: exactly two types of characters.\n"
             "- Weak: exactly one type of character.\n";
-    cin.ignore();
-    getline(cin,id);
+    cin >> password;
     while (!validPassword(password) || !passwordDifficulty(password ,get_out))
     {
         if (get_out == '1')
@@ -362,11 +360,10 @@ void Register (Database& db) {
                 "- Strong: at least three of lowercase, uppercase, digits, special characters.\n"
                 "- Medium: exactly two types of characters.\n"
                 "- Weak: exactly one type of character.\n";
-        getline(cin,id);
+        cin >> password;
     }
     cout << "Please enter your name (must contain only letters and not more than 50 letters):\n";
-    cin.ignore();
-    getline(cin,id);
+    cin >> name;
     while (!validateName(name))
     {
         cout << "You entered an invalid name. Name must contain only letters and not exceed 50 characters. Please try again.\n";
@@ -375,11 +372,10 @@ void Register (Database& db) {
         if (get_out == '0')
             return;
         cout << "Please enter your name (must contain only letters and not more than 50 letters):\n";
-        getline(cin,id);
+        cin >> name;
     }
     cout << "Please enter your age (18 - 99):\n";
-    cin.ignore();
-    getline(cin,id);
+    cin >> age;
     while (!validateAge(age))
     {
         cout << "You entered an invalid age. Age must be between 18 - 99. Please try again.\n";
@@ -389,7 +385,7 @@ void Register (Database& db) {
         if (get_out == '0')
             return;
         cout << "Please enter your age (18 - 99):\n";
-        getline(cin,id);
+        cin >> age;
     }
     cout << "please tell about yourself\n";
     cin.ignore();
@@ -547,4 +543,3 @@ void ForgotPassword(Database& db) {
     if(CheckUserAnswer(db,id))
         ChangePassword(db,id);
 }
-
