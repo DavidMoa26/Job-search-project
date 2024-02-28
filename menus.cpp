@@ -159,18 +159,20 @@ void MainMenu(Database& db)
             {
                 string result = Login(db);
 
-                if (result == "ERROR")
-
-                while(result == "ERROR")
-                    result = Login(db);
-                if(result == "RETURN")
+                if(result == "BACK")
+                    continue;
+                else {
+                    while (result == "ERROR")
+                        result = Login(db);
+                    if (result == "RETURN")
+                        break;
+                    string role = GetUserRole(db, result);
+                    if (role == "employer")
+                        EmployerMenu(db, result);
+                    else
+                        CandidateMenu(db, result);
                     break;
-                string role = GetUserRole(db,result);
-                if(role == "employer")
-                    EmployerMenu(db,result);
-                else
-                    CandidateMenu(db,result);
-                break;
+                }
             }
             case FORGOT_PASSWORD:
             {

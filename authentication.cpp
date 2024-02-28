@@ -428,12 +428,14 @@ string Login (Database& db) {
     }
     try {
         string id, password;
-        cout << "Enter Your ID (must be 9 digits).\n";
+        cout << "Enter Your ID (must be 9 digits)/or press B to go back.\n";
         cin >> id;
-
-        cout << "Enter Your password.\n";
+        if(id == "B" || id == "b")
+            return "BACK";
+        cout << "Enter Your password/or press B to go back.\n";
         cin >> password;
-
+        if(password == "B" || password == "b")
+            return "BACK";
         Statement query(db, "SELECT password,role FROM users WHERE id = ?");
         query.bind(1, stoi(id));
         if (query.executeStep())
