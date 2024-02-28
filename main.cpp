@@ -11,11 +11,9 @@ enum ConsoleColor
 };
 
 #include <iostream>
-#include "authentication.h"
 #include "menus.h"
-#include "candidate.h"
-#include "employer.h"
 #include <SQLiteCpp/SQLiteCpp.h>
+#include "TableCreation.h"
 
 
 using namespace std;
@@ -24,8 +22,8 @@ using namespace SQLite;
 int main()
 {
     Database db("db.db", OPEN_READWRITE|OPEN_CREATE);
+    CreateTables(db);
     MainMenu(db);
     cout << "GOODBYE\n";
     return 0;
 }
-

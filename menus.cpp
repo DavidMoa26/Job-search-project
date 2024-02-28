@@ -9,51 +9,87 @@ using namespace SQLite;
 using namespace std;
 
 enum SearchMenu{VIEW_ALL_JOBS = '1', SEARCH_BY_CATEGORY, BACK_TO_CANDIDATE_MENU};
-enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};
-enum EmployerMenu{PUBLISH_JOB = '1',DELETE_JOB,EDIT_JOB, VIEW_ALL_JOBS_YOU_PUBLISHED, VIEW_CANDIDATES_PROFILES,SEND_INVITATION,VIEW_INVITATION,FILTER, LOG_OUT_E};
+enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED,EDIT_PROFILE , VIEW_INTERVIEW_INVITATIONS,VIEW_INTERVIEW_QUESTIONS, LOG_OUT_C};
+enum EmployerMenu{PUBLISH_JOB = '1',DELETE_JOB,EDIT_JOB, VIEW_ALL_JOBS_YOU_PUBLISHED,EDIT_PROFILE_EMP,FILTER,SEND_INVITATION,VIEW_INVITATION, LOG_OUT_E};
 enum MainMenu{REGISTER = '1', LOGIN,FORGOT_PASSWORD,EXIT};
-
 
 
 void CandidateMenu(Database& db , string& id)
 {
-    char option;
-    while (true) {
+    try {
+        Statement query(db, "SELECT * FROM users");
 
-        bool flagForContinue = false;
-        while (!flagForContinue) {
-            cout << "1. Look for jobs.\n"
-                    "2. Create your resume.\n"
-                    "3. View all the jobs you submitted your resume.\n"
-                    "4. Edit your profile.\n"
-                    "5. View all the interview invitations you got.\n"
-                    "6. Log out from the system.\n"
-                    "Please enter your choice : \n";
-            cin >> option;
-            switch (option) {
-                case LOOK_FOR_JOBS:
-                    LookForJobsMenu(db, id);
-                    break;
-                case CREATE_RESUME:
-                    CreateResume(db, id);
-                    break;
-                case VIEW_JOBS_SUBMITTED:
-                    ViewAllSubmittedJobs(db, id);
-                    break;
-                case EDIT_PROFILE:
-                    break;
-                case VIEW_INTERVIEW_INVITATIONS:
-                    break;
-                case LOG_OUT_C:
-                    return;
-                default:
-                    cout << "You enter an illegal option, please try again!" << endl;
+        while (query.executeStep())
+        {
+            string ids = query.getColumn(0).getText();
+            string name = query.getColumn(2).getText();
+            if(ids == id)
+            {
+                cout << "Welcome to JobSearch" << " " << name << endl;
             }
+        }
+    }
+    catch(exception & e)
+    {
+        cerr << "SQLite exception: " << e.what() << endl;
+    }
+    char option;
+
+    while (true) {
+        cout << "1. Look for jobs.\n"
+                "2. Create your resume.\n"
+                "3. View all the jobs you submitted your resume.\n"
+                "4. Edit your profile.\n"
+                "5. View all the interview invitations you got.\n"
+                "6. View all interview questions.\n"
+                "7. Log out from the system.\n"
+                "Please enter your choice : \n";
+        cin >> option;
+        switch (option) {
+            case LOOK_FOR_JOBS:
+                LookForJobsMenu(db, id);
+                break;
+            case CREATE_RESUME:
+                CreateResume(db, id);
+                break;
+            case VIEW_JOBS_SUBMITTED:
+                ViewAllSubmittedJobs(db, id);
+                break;
+            case EDIT_PROFILE:
+                break;
+            case VIEW_INTERVIEW_INVITATIONS:
+                RejectAcceptInterviewInvitation(db,id);
+                break;
+            case VIEW_INTERVIEW_QUESTIONS:
+                ViewAllInterviewQuestions(db,id);
+                break;
+            case LOG_OUT_C:
+                return;
+            default:
+                cout << "You enter an illegal option, please try again!" << endl;
         }
     }
 }
 void EmployerMenu(Database& db, string& id) {
+    try {
+        Statement query(db, "SELECT * FROM users");
+
+        while (query.executeStep())
+        {
+            string ids = query.getColumn(0).getText();
+            string name = query.getColumn(2).getText();
+            if(ids == id)
+            {
+                cout << "Welcome to JobSearch" << " " << name << endl;
+            }
+        }
+    }
+    catch(exception & e)
+    {
+        cerr << "SQLite exception: " << e.what() << endl;
+    }
     char option;
+
     bool flagForContinue = false;
     while (!flagForContinue)
     {
@@ -61,14 +97,13 @@ void EmployerMenu(Database& db, string& id) {
                 "2. Delete a job.\n"
                 "3. Edit a job.\n"
                 "4. View all the jobs you have already published.\n"
-                "5. Send question for candidate to test him .\n"
-                "6. Send an invitation to a candidate the submitted their resume.\n"
-                "7. View all the interview invitations the employer has send\n"
+                "5. edit profile.\n"
+                "6. Filter candidate resume that submitted their resume for minimum years of experience..\n"
+                "7. Send an invitation to a candidate the submitted their resume\n"
                 "8. View all the interview invitations the employer has send\n"
                 "9. Log out. \n"
                 "Please enter your choice!\n";
         cin >> option;
-
         switch (option)
         {
             case PUBLISH_JOB:
@@ -83,16 +118,14 @@ void EmployerMenu(Database& db, string& id) {
             case VIEW_ALL_JOBS_YOU_PUBLISHED:
                 FetchAllJobs(db,id);
                 break;
-            case VIEW_CANDIDATES_PROFILES:
+            case FILTER:
+                FillterCandidateResume(db,id);
                 break;
             case SEND_INVITATION:
                 SendInterviewInvitation(db,id);
                 break;
             case VIEW_INVITATION:
                 ViewAllInterviewInvitation(db,id);
-                break;
-            case FILTER:
-//                Create function to filter candidate by experience
                 break;
             case LOG_OUT_E:
                 flagForContinue = true;
@@ -104,6 +137,7 @@ void EmployerMenu(Database& db, string& id) {
 }
 void MainMenu(Database& db)
 {
+
     char option;
     bool illegalOption = false;
     while (!illegalOption)
@@ -129,8 +163,8 @@ void MainMenu(Database& db)
 
                 if (result == "ERROR")
 
-                while(result == "ERROR")
-                    result = Login(db);
+                    while(result == "ERROR")
+                        result = Login(db);
                 if(result == "RETURN")
                     break;
                 string role = GetUserRole(db,result);

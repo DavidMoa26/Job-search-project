@@ -8,9 +8,11 @@
 #include <string>
 #include "employer.h"
 #include "candidate.h"
+#include "authentication.h"
 #define WIDTH 45
 #define BORDER_CHAR '|'
 #define FILL_CHAR '-'
+enum EditingSearchMenu{CHANGE_NAME = '1', CHANGE_AGE, CHANGE_PASSWORD,CHANGE_FREETEXT,CHANGE_QUESTION, BACK_TO_MENU};
 enum DegreesMenu{DOES_NOT_HAVE = '0', BA, MA, PHD};
 enum CategoriesSearchMenu{SEARCH_BY_LOCATION = '1', SEARCH_BY_SCOPE, SEARCH_BY_EXPERIENCE_YEARS, SEARCH_BY_PROFESSION, BACK_TO_LOOK_FOR_JOBS_MENU};
 using namespace std;
@@ -42,23 +44,16 @@ void ViewAllJobs(Database& db)
     }
     try {
         Statement query(db, "SELECT * FROM jobs_list");
-        if(query.executeStep())
+
+        while (query.executeStep())
         {
-            while (query.executeStep())
-            {
-                string jobId = query.getColumn(0).getText();
-                string companyName = query.getColumn(2).getText();
-                string location = query.getColumn(3).getText();
-                string position = query.getColumn(4).getText();
-                string scope = query.getColumn(6).getText();
-                string experience = query.getColumn(7).getText();
-                PrintJob(jobId, companyName, location, position, scope, experience);
-            }
-        }
-        else
-        {
-            cout << "No jobs found.\n";
-            return;
+            string jobId = query.getColumn(0).getText();
+            string companyName = query.getColumn(2).getText();
+            string location = query.getColumn(3).getText();
+            string position = query.getColumn(4).getText();
+            string scope = query.getColumn(6).getText();
+            string experience = query.getColumn(7).getText();
+            PrintJob(jobId, companyName, location, position, scope, experience);
         }
     }
     catch(exception & e)
@@ -118,7 +113,7 @@ string* SelectFilter(Database& db)
         cout << "1. Filter by location.\n"
              << "2. Filter by scope.\n"
              << "3. Filter by experience years.\n"
-                "4  Filter by your wanted profession.\n"
+                "4. Filter by your wanted profession.\n"
                 "5  Back.\n";
         char option;
         cin >> option;
@@ -495,7 +490,7 @@ void ViewAllSubmittedJobs(Database& db, string& candidate_id)
 {
     if (!ResumeSubmissionsTableExists(db))
     {
-        cout << "ResumeSubmissions table does not exist.\n";
+        cout << "Resume Submissions table does not exist.\n";
         return;
     }
     try {
@@ -527,5 +522,282 @@ void ViewAllSubmittedJobs(Database& db, string& candidate_id)
     catch(exception & e)
     {
         cerr << "SQLite exception: " << e.what() << endl;
+    }
+}
+void ViewAllInterviewQuestions(Database& db, string& candidate_id) {
+    string question,answer1,answer2,answer3,answer4,employer_id,employer_name,question_id , question_choice,answer_choice;
+    bool flag_query1 = false;
+    bool flag_query2 = false;
+    try {
+        Statement query1(db, "SELECT question, answer1, answer2, answer3, answer4, employer_id, id FROM tests WHERE candidate_id = ? AND grade IS NULL");
+        query1.bind(1, stoi(candidate_id));
+        while (query1.executeStep()) {
+            flag_query1 = true;
+            question = query1.getColumn(0).getText();
+            answer1 = query1.getColumn(1).getText();
+            answer2 = query1.getColumn(2).getText();
+            answer3 = query1.getColumn(3).getText();
+            answer4 = query1.getColumn(4).getText();
+            employer_id = query1.getColumn(5).getText();
+            question_id = query1.getColumn(6).getText();
+
+            cout << "Question number : " <<question_id << "\n" << question <<"\n"
+                 << "1. "<< answer1 << "\n"
+                 << "2. "<< answer2 << "\n"
+                 << "3. "<< answer3 << "\n"
+                 << "4. "<< answer4 << "\n"
+                 << " ===================================== \n \n";
+        }
+        if (!flag_query1) {
+            cout << "No interview questions.\n";
+            return;
+        }
+
+        cout << "Enter number of question you want answer : \n";
+        cin >> question_choice;
+        try {
+            Statement query2(db,"SELECT id,correct_answer FROM tests WHERE id = ?");
+            query2.bind(1, stoi(question_choice));
+            while (query2.executeStep()) {
+                flag_query2 = true;
+                string storedCorrectAnswer = query2.getColumn(1).getText();
+                cout << "Enter the answer 1-4 : \n";
+                cin >> answer_choice;
+                if(storedCorrectAnswer == answer_choice) {
+                    int grade = 100;
+                    Statement query3(db,"UPDATE tests SET grade = ? WHERE id = ?");
+                    query3.bind(1, grade);
+                    query3.bind(2, stoi(question_choice));
+                    query3.exec();
+                    cout << "Correct\n";
+                }
+                else {
+                    int grade = 0;
+                    Statement query3(db,"UPDATE tests SET grade = ? WHERE id = ?");
+                    query3.bind(1, grade);
+                    query3.bind(2, stoi(question_choice));
+                    query3.exec();
+                    cout << "Wrong\n";
+                }
+            }
+            if(!flag_query2) {
+                cout << "Wrong question choice\n";
+            }
+        } catch(exception & e) {
+            cerr << "SQLite exception: " << e.what() << endl;
+        }
+
+    }
+    catch(exception & e)
+    {
+        cerr << "SQLite exception: " << e.what() << endl;
+    }
+}
+void RejectAcceptInterviewInvitation(Database&db,string&id)
+{
+    while (true)
+    {
+        try {
+            // Select data from submission table where status is accepted and candidate_id matches the provided id
+            Statement selectQuery(db, "SELECT job_id FROM submission WHERE status = 'accepted' AND candidate_id = ?;");
+
+            // Bind the candidate_id parameter
+            selectQuery.bind(1, id);
+
+            // Execute the query
+            while (selectQuery.executeStep()) {
+                string job_id = selectQuery.getColumn(0).getText();
+                cout << "You have an interview invitation for job id:" << job_id << endl;
+            }
+        } catch (const exception &e) {
+            cerr << "SQLite exception: " << e.what() << endl;
+        }
+
+        cout << "select a job id you want to accept/reject the invitation or press B to go back\n";
+        string job_id;
+        cin >> job_id;
+        if(job_id == "B" || job_id == "b")
+            return;
+        char choice;
+        cout << "1. Accept" << endl;
+        cout << "2. Reject" << endl;
+        cout << "3. Go Back" << endl;
+        cin >> choice;
+        choice = tolower(choice); // Convert choice to lowercase
+
+        string status;
+        if (choice == '1')
+            status = "accept";
+        else if (choice == '2')
+            status = "rejected";
+        else if (choice == '3')
+            break;
+        else
+        {
+            cout << "Invalid choice. Please enter '1' or '2' or '3'." << endl;
+            continue; // Restart the loop
+        }
+
+        try
+        {
+            // Update submission status based on choice
+            db.exec("UPDATE submission SET status = '" + status + "' WHERE job_id = '" + job_id + "' AND candidate_id = '" + id + "'");
+
+            cout << "Invitation " << status << endl;
+
+        } catch(exception& e)
+        {
+            cerr << "SQLite exception: " << e.what() << endl;
+        }
+    }
+}
+void editName(Database& db,  string& id) {
+    string newName;
+    cout << "Please enter your name (must contain only letters and not more than 50 letters):\n";
+    cin >> newName;
+    while (!validateName(newName)) {
+        cout << "You entered an invalid name. Name must contain only letters and not exceed 50 characters. Please try again.\n";
+        cout << "If you want to return to the main menu, press '0'. Otherwise, press any other character to enter the name again:\n";
+        string get_out;
+        cin >> get_out;
+        if (get_out == "0")
+            return;
+        cout << "Please enter your name (must contain only letters and not more than 50 letters):\n";
+        cin >> newName;
+    }
+    try {
+        db.exec("UPDATE users SET name = '" + newName + "' WHERE id = '" + id + "'");
+        cout << "Name updated successfully.\n";
+    } catch (exception& e) {
+        cerr << "SQLite exception: " << e.what() << endl;
+    }
+}
+void editAge(Database& db,  string& id) {
+    string newAge;
+    cout << "Please enter your age (18 - 99):\n";
+    cin >> newAge;
+    while (!validateAge(newAge)) {
+        cout << "You entered an invalid age. Age must be between 18 - 99. Please try again.\n";
+        cout << "Press '0' to return to the main menu.\n"
+             << "Press any other character to enter age again.\n";
+        string get_out;
+        cin >> get_out;
+        if (get_out == "0")
+            return;
+        cout << "Please enter your age (18 - 99):\n";
+        cin >> newAge;
+    }
+    try {
+        db.exec("UPDATE users SET age = " + newAge + " WHERE id = '" + id + "'");
+        cout << "Age updated successfully.\n";
+    } catch (exception& e) {
+        cerr << "SQLite exception: " << e.what() << endl;
+    }
+}
+void editPassword(Database& db,  string& id,string&get_out)
+{
+    string newPassword;
+    cout << "Please enter a password (6 to 12 characters, no spaces).\n"
+            "Feedback on password difficulty:\n"
+            "- Strong: at least three of lowercase, uppercase, digits, special characters.\n"
+            "- Medium: exactly two types of characters.\n"
+            "- Weak: exactly one type of character.\n";
+    cin >> newPassword;
+    while (!validPassword(newPassword))
+    {
+        if (get_out == "1")
+            return;
+        cout << "Please enter a password (6 to 12 characters, no spaces).\n"
+                "Feedback on password difficulty:\n"
+                "- Strong: at least three of lowercase, uppercase, digits, special characters.\n"
+                "- Medium: exactly two types of characters.\n"
+                "- Weak: exactly one type of character.\n";
+        cin >> newPassword;
+    }
+    try {
+        db.exec("UPDATE users SET password = '" + newPassword + "' WHERE id = '" + id + "'");
+        cout << "Password updated successfully.\n";
+    } catch (exception& e) {
+        cerr << "SQLite exception: " << e.what() << endl;
+    }
+}
+void editFreeText(Database& db,  string& id) {
+    string freetext;
+    cout << "Please tell about yourself\n";
+    cin.ignore();
+    getline(cin, freetext);
+    while (!validFreeText(freetext)) {
+        cout << "You entered an invalid free text. Text must contain not more than 200 characters.\n";
+        cout << "Press '0' to return to the main menu.\n"
+             << "Press any other character to enter free text again.\n";
+        string get_out;
+        cin >> get_out;
+        if (get_out == "0")
+            return;
+        cout << "Please tell about yourself\n";
+        cin.ignore();
+        getline(cin, freetext);
+    }
+    try {
+        // Update the database with the new free text
+        db.exec("UPDATE users SET freetext = '" + freetext + "' WHERE id = '" + id + "'");
+        cout << "Free text updated successfully.\n";
+    } catch (exception& e) {
+        cerr << "SQLite exception: " << e.what() << endl;
+    }
+}
+void editQuestion(Database& db,  string& id,string &get_out)
+{
+    string question, answer;
+    while (!selectQuestion(question, answer, get_out))
+    {
+        if (get_out == "0")
+            return;
+    }
+    string query = "UPDATE forgot_password SET question = '" + question + "', answer = '" + answer + "' WHERE id = '" + id + "'";
+    try {
+        db.exec(query);
+        cout << "Question and answer updated successfully.\n";
+    } catch (exception& e) {
+        cerr << "SQLite exception: " << e.what() << endl;
+    }
+}
+void editProfile(Database& db, string& id) {
+    string option;
+    string get_out;
+    while (true)
+    {
+        cout << "Choose an option to edit your profile:\n"
+                "1. Edit name.\n"
+                "2. Edit age.\n"
+                "3. Edit password.\n"
+                "4. Edit Freetext.\n"
+                "5. Edit questions.\n"
+                "6. Back.\n";
+        cin >> option;
+        if(option.length() > 1)
+            option = "10";
+        switch (option[0])
+        {
+            case CHANGE_NAME:
+                editName(db, id);
+                break;
+            case CHANGE_AGE:
+                editAge(db, id);
+                break;
+            case CHANGE_PASSWORD:
+                editPassword(db, id,get_out);
+                break;
+            case CHANGE_FREETEXT:
+                editFreeText(db, id);
+                break;
+            case CHANGE_QUESTION:
+                editQuestion(db, id,get_out);
+                break;
+            case BACK_TO_MENU:
+                return;
+            default:
+                cout << "Invalid option. Please try again.\n";
+        }
     }
 }

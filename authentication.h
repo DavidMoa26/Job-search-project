@@ -7,17 +7,17 @@
 using namespace SQLite;
 using namespace std;
 
-
 //Validation of fields
+bool NotValidSpace(string&);
 bool CheckIdLength(string&);
 bool CheckIfIdIsDigits(string&);
-bool ValidatePassword(string&);
-bool validateId(string &);
-bool validateName(string &);
-bool validateAge(string &);
-bool validFreeText(string &);
-bool passwordDifficulty(string&);
-bool selectQuestion(string &, string &);
+bool validPassword(string&);
+bool validateId(string&);
+bool validateName(string&);
+bool validateAge(string&);
+bool validFreeText(string&);
+bool passwordDifficulty(string&, string&);
+bool selectQuestion(string&, string&,string&);
 
 //Validation of tables
 bool UsersTableExists(Database&);

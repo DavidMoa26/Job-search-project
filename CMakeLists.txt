@@ -19,7 +19,9 @@ add_executable(
         candidate.cpp
         employer.cpp
         employer.h
-        candidate.h)
+        candidate.h
+        TableCreation.cpp
+        TableCreation.h)
 
 # Link against SQLiteCpp (and sqlite3 if necessary)
 target_link_libraries(JobSearchProject SQLiteCpp)

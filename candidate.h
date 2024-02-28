@@ -30,5 +30,15 @@ void CreateResumeSubmissionsTable(Database& db);
 void InsertSubmitToTable(Database& db, string& id, string& jobId);
 void SubmitResume(Database& db, string& id, string& jobId);
 void ViewAllSubmittedJobs(Database& db, string& candidate_id);
+void ViewAllInterviewQuestions(Database&, string&);
 
+
+void editName(Database&,  string&);
+void editAge(Database&,  string&);
+void editPassword(Database&,  string&,string&);
+void editFreeText(Database&,  string&);
+void editQuestion(Database&,  string&,string &);
+void editProfile(Database&, string&);
+
+void RejectAcceptInterviewInvitation(Database&db,string&id);
 #endif //MAIN_CPP_CANDIDATE_H
