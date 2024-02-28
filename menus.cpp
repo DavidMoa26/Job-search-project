@@ -94,7 +94,7 @@ void EmployerMenu(Database& db, string& id) {
                 "3. Edit a job.\n"
                 "4. View all the jobs you have already published.\n"
                 "5. Send question for candidate to test him .\n"
-                "6. Filter job for minimum years of experience..\n"
+                "6. Filter candidate resume that submitted their resume for minimum years of experience..\n"
                 "7. Send an invitation to a candidate the submitted their resume\n"
                 "8. View all the interview invitations the employer has send\n"
                 "9. Log out. \n"
