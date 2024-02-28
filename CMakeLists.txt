@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.23)
 project(JobSearchProject)  # Adjust project name as needed
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 # Add the SQLiteCpp directory to the build
 
@@ -19,7 +19,9 @@ add_executable(
         candidate.cpp
         employer.cpp
         employer.h
-        candidate.h)
+        candidate.h
+TableCreation.cpp
+TableCreation.h)
 
 # Link against SQLiteCpp (and sqlite3 if necessary)
 target_link_libraries(JobSearchProject SQLiteCpp)

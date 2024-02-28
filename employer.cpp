@@ -388,7 +388,8 @@ void SendInterviewInvitation(Database&db,string&id)
         printCandidateResume(db,select_id);
         char choice;
         cout << "1. Accept" << endl;
-        cout << "2. Back" << endl;
+        cout << "2. Reject" << endl;
+        cout << "3. Go Back" << endl;
         cin >> choice;
         choice = tolower(choice); // Convert choice to lowercase
 
@@ -400,7 +401,9 @@ void SendInterviewInvitation(Database&db,string&id)
                 CreateInterviewInvitationTable(db);
             insertToInterviewInvitationtable(db,select_id,job_idSelected,id);
         }
-        else if (choice == '2')
+        else if(choice == '2')
+            status = "reject";
+        else if (choice == '3')
         {
             break;
         }
@@ -425,21 +428,29 @@ void SendInterviewInvitation(Database&db,string&id)
 
 }
 void ViewAllInterviewInvitation(Database& db, string&employee_id) {
+    int count = 0;
     try {
         // Select data from Interview_invitations table where candidate_id matches the provided employee_id
-        Statement selectQuery(db, "SELECT * FROM Interview_invitations WHERE candidate_id = ?;");
+        Statement selectQuery(db, "SELECT * FROM Interview_invitations WHERE employer_id = ?;");
 
         // Bind the employee_id parameter
         selectQuery.bind(1, employee_id);
 
         // Execute the query
         while (selectQuery.executeStep()) {
-            string job_id = selectQuery.getColumn(1).getText(); // Assuming job_id is the second column
+            string id_emp = selectQuery.getColumn(0);
+            string candidate_id = selectQuery.getColumn(1);
+            string job_id = selectQuery.getColumn(2).getText(); // Assuming job_id is the second column
 
-            // Print the data
-            cout << "Candidate ID: " << employee_id << ", Job_id: " << job_id << endl;
-            // Add more columns as needed
+            if(id_emp == employee_id)
+            {
+                cout << "Interview invitation for job id:" << job_id << " was send to candidate id:" << candidate_id
+                     << endl;
+                ++count;
+            }
         }
+        if(count == 0)
+            cout << "No history found\n";
     } catch(const exception& e) {
         cerr << "SQLite exception: " << e.what() << endl;
     }
@@ -537,7 +548,7 @@ void insertToInterviewInvitationtable(Database&db,string&candidate_id,string&job
         CreateInterviewInvitationTable(db);
     }
         try {
-            Statement query(db, "INSERT INTO Interview_invitations (employee_id, candidate_id, job_id) VALUES (? ,?, ?)");
+            Statement query(db, "INSERT INTO Interview_invitations (employer_id, candidate_id, job_id) VALUES (? ,?, ?)");
             query.bind(1, employee_id);
             query.bind(2, candidate_id);
             query.bind(3, job_id);

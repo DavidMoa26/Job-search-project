@@ -522,3 +522,62 @@ void ViewAllSubmittedJobs(Database& db, string& candidate_id)
         cerr << "SQLite exception: " << e.what() << endl;
     }
 }
+
+void RejectAcceptInterviewInvitation(Database&db,string&id)
+{
+    while (true)
+    {
+        try {
+                // Select data from submission table where status is accepted and candidate_id matches the provided id
+                Statement selectQuery(db, "SELECT job_id FROM submission WHERE status = 'accepted' AND candidate_id = ?;");
+
+                // Bind the candidate_id parameter
+                selectQuery.bind(1, id);
+
+                // Execute the query
+                while (selectQuery.executeStep()) {
+                    string job_id = selectQuery.getColumn(0).getText();
+                    cout << "You have an interview invitation for job id:" << job_id << endl;
+                }
+        } catch (const exception &e) {
+            cerr << "SQLite exception: " << e.what() << endl;
+        }
+
+        cout << "select a job id you want to accept/reject the invitation or press B to go back\n";
+        string job_id;
+        cin >> job_id;
+        if(job_id == "B" || job_id == "b")
+            return;
+        char choice;
+        cout << "1. Accept" << endl;
+        cout << "2. Reject" << endl;
+        cout << "3. Go Back" << endl;
+        cin >> choice;
+        choice = tolower(choice); // Convert choice to lowercase
+
+        string status;
+        if (choice == '1')
+            status = "accept";
+        else if (choice == '2')
+            status = "rejected";
+        else if (choice == '3')
+            break;
+        else
+        {
+            cout << "Invalid choice. Please enter '1' or '2' or '3'." << endl;
+            continue; // Restart the loop
+        }
+
+        try
+        {
+            // Update submission status based on choice
+            db.exec("UPDATE submission SET status = '" + status + "' WHERE job_id = '" + job_id + "' AND candidate_id = '" + id + "'");
+
+            cout << "Invitation " << status << endl;
+
+        } catch(exception& e)
+        {
+            cerr << "SQLite exception: " << e.what() << endl;
+        }
+    }
+}

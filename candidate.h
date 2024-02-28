@@ -31,4 +31,6 @@ void InsertSubmitToTable(Database& db, string& id, string& jobId);
 void SubmitResume(Database& db, string& id, string& jobId);
 void ViewAllSubmittedJobs(Database& db, string& candidate_id);
 
+
+void RejectAcceptInterviewInvitation(Database&db,string&id);
 #endif //MAIN_CPP_CANDIDATE_H
