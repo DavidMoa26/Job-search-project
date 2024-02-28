@@ -56,6 +56,7 @@ void CandidateMenu(Database& db , string& id)
                 ViewAllSubmittedJobs(db, id);
                 break;
             case EDIT_PROFILE:
+                editProfile(db,id);
                 break;
             case VIEW_INTERVIEW_INVITATIONS:
                 RejectAcceptInterviewInvitation(db,id);
