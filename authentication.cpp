@@ -1,6 +1,7 @@
 #include <SQLiteCpp/SQLiteCpp.h>
 #include "iostream"
 #include <string>
+#include <limits>
 
 enum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3,QUESTION_4,QUESTION_5,GO_BACK};
 #define MAX_PASSWORD_SIZE 12
@@ -16,6 +17,18 @@ using namespace SQLite;
 using namespace std;
 
 //Validation of fields
+bool NotValidSpace(string&string)
+{
+    for(int i = 0;i < string.length();++i)
+    {
+        if(string[i] == ' ')
+        {
+            cout << "not valid\n";
+            return false;
+        }
+    }
+    return true;
+}
 bool CheckIdLength(string &id) {
     return id.length() == 9;
 }
@@ -74,20 +87,30 @@ bool validateName(string &name) {
             return false;
         }
     }
+    if(name.length() == 0)
+        return false;
     if (name.length() >= 50)
     {
         return false;
     }
+    if (!NotValidSpace(name))
+        return false;
 
     return true;
 }
 bool validateAge(string &age) {
 
+    if(age.length() == 0)
+        return false;
     int ageNumber = stoi(age);
     if (ageNumber < 18 || ageNumber > 99)
     {
         return false;
     }
+    if (!NotValidSpace(age))
+        return false;
+    if(age.length() == 0)
+        return false;
     return true;
 }
 bool validFreeText(string &freeText)
@@ -101,7 +124,7 @@ bool validFreeText(string &freeText)
     return true;
 
 }
-bool passwordDifficulty(string&password,char &get_out)
+bool passwordDifficulty(string&password,string &get_out)
 {
     string feedback;
     bool special_character = false;
@@ -141,15 +164,18 @@ bool passwordDifficulty(string&password,char &get_out)
     if (counter == COUNT_FEEDBACK3)
         cout << "The password is strong\n";
     cout << "Do you want to change your password?(press 0 for yes/any other character for no/to return to main menu press 1)\n";
-    cin >> get_out;
-    if(get_out == '0')
+    getline(cin, get_out);
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    if(get_out != "0" && get_out != "1")
+        get_out == "8";
+    if(get_out == "0")
         return false;
-    if(get_out == '1')
+    if(get_out == "1")
         return false;
     return true;
 
 }
-bool selectQuestion(string &question, string &answer ,char &get_out)
+bool selectQuestion(string &question, string &answer ,string &get_out)
 {
 
 
@@ -326,86 +352,100 @@ bool InsertUserToDatabase(Database& db, string& id, string& password, string& na
 }
 void Register (Database& db) {
     string id, password, name, age,role,question, answer,freetext;
-    char get_out;
+    string get_out;
     if(!UsersTableExists(db))
         CreateUsersTable(db);
     cout << "Dear user, please enter your details to sign up.\n";
     cout << "Please enter your ID (ID must contain 9 digits):\n";
 
-    cin >> id;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    getline(cin, id);
     while (!validateId(id))
     {
         cout << "You entered an invalid ID. ID must contain exactly 9 digits. Please try again.\n";
         cout << "Press '0' to return to the main menu.\n"
              << "Press any other character to enter ID again.\n";
 
-        cin >> get_out;
-        if (get_out == '0')
+        getline(cin, get_out);
+        if(get_out != "0")
+            get_out == "5";
+        if (get_out == "0")
             return;
+
         cout << "Please enter your ID (ID must contain 9 digits):\n";
-        cin >> id;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        getline(cin, id);
     }
     cout << "Please enter a password (6 to 12 characters, no spaces).\n"
             "Feedback on password difficulty:\n"
             "- Strong: at least three of lowercase, uppercase, digits, special characters.\n"
             "- Medium: exactly two types of characters.\n"
             "- Weak: exactly one type of character.\n";
-    cin >> password;
+    getline(cin, password);
     while (!validPassword(password) || !passwordDifficulty(password ,get_out))
     {
-        if (get_out == '1')
+        if (get_out == "1")
             return;
         cout << "Please enter a password (6 to 12 characters, no spaces).\n"
                 "Feedback on password difficulty:\n"
                 "- Strong: at least three of lowercase, uppercase, digits, special characters.\n"
                 "- Medium: exactly two types of characters.\n"
                 "- Weak: exactly one type of character.\n";
-        cin >> password;
+        cin.ignore();
+        getline(cin, password);
     }
     cout << "Please enter your name (must contain only letters and not more than 50 letters):\n";
-    cin >> name;
+    cin.ignore();
+    getline(cin, name);
     while (!validateName(name))
     {
         cout << "You entered an invalid name. Name must contain only letters and not exceed 50 characters. Please try again.\n";
         cout << "If you want to return to the main menu, press '0'. Otherwise, press any other character to enter the name again:\n";
-        cin >> get_out;
-        if (get_out == '0')
+        getline(cin, get_out);
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        if(get_out != "0")
+            get_out == "5";
+        if (get_out == "0")
             return;
         cout << "Please enter your name (must contain only letters and not more than 50 letters):\n";
-        cin >> name;
+        getline(cin, name);
     }
     cout << "Please enter your age (18 - 99):\n";
-    cin >> age;
+    getline(cin, age);
     while (!validateAge(age))
     {
         cout << "You entered an invalid age. Age must be between 18 - 99. Please try again.\n";
         cout << "Press '0' to return to the main menu.\n"
              << "Press any other character to enter age again.\n";
-        cin >> get_out;
-        if (get_out == '0')
+        getline(cin, get_out);
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        if(get_out != "0")
+            get_out == "5";
+        if (get_out == "0")
             return;
         cout << "Please enter your age (18 - 99):\n";
-        cin >> age;
+        getline(cin, age);
     }
     cout << "please tell about yourself\n";
-    cin.ignore();
     getline(cin, freetext);
     while (!validFreeText(freetext))
     {
         cout << "You entered an invalid free text. text must contain not more then 200 characters.\n";
         cout << "Press '0' to return to the main menu.\n"
              << "Press any other character to enter free text again.\n";
-        cin >> get_out;
-        if (get_out == '0')
+        getline(cin, get_out);
+        if(get_out != "0")
+            get_out == "5";
+        if (get_out == "0")
             return;
         cout << "please tell about yourself\n";
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(cin, freetext);
     }
     while (!selectQuestion(question,answer,get_out))
     {
 
-        if (get_out == '0')
+        if (get_out == "0")
             return;
     }
 
@@ -505,7 +545,7 @@ bool CheckUserAnswer(Database& db, string& id) {
 }
 void ChangePassword (Database& db, string& id) {
     string newPassword;
-    char get_out;
+    string get_out;
     cout << "Please enter a password (6 to 12 characters, no spaces).\n"
             "Feedback on password difficulty:\n"
             "- Strong: at least three of lowercase, uppercase, digits, special characters.\n"
@@ -514,7 +554,7 @@ void ChangePassword (Database& db, string& id) {
     cin >> newPassword;
     while (!validPassword(newPassword) || !passwordDifficulty(newPassword ,get_out))
     {
-        if (get_out == '1')
+        if (get_out == "1")
             return;
         cout << "Please enter a password (6 to 12 characters, no spaces).\n"
                 "Feedback on password difficulty:\n"

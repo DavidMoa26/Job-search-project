@@ -7,7 +7,7 @@
 using namespace SQLite;
 using namespace std;
 
-
+bool NotValidSpace(string&string);
 //Validation of fields
 bool CheckIdLength(string&);
 bool CheckIfIdIsDigits(string&);
@@ -16,7 +16,7 @@ bool validateId(string &);
 bool validateName(string &);
 bool validateAge(string &);
 bool validFreeText(string &);
-bool passwordDifficulty(string&);
+bool passwordDifficulty(string&,string&);
 bool selectQuestion(string &, string &);
 
 //Validation of tables

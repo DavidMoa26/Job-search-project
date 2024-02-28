@@ -8,6 +8,7 @@
 #include <string>
 #include "employer.h"
 #include "candidate.h"
+#include "authentication.h"
 #define WIDTH 45
 #define BORDER_CHAR '|'
 #define FILL_CHAR '-'
@@ -318,17 +319,21 @@ void CreateResume(Database& db, string& id)
         return;
     string full_name, age, degree1, degree2, degree3, work_experience, years_of_experience;
     cout << "Enter your full name : \n";
-    cin >> full_name;
+    cin.ignore();
+    getline(cin,full_name);
     while(full_name.empty())
     {
         cout << "Full name cannot be empty. Please try again:\n";
-        cin >> full_name;
+        cin.ignore();
+        getline(cin,full_name);
     }
     cout << "Enter your age : \n";
-    cin >> age;
-    while(age.empty()) {
+    cin.ignore();
+    getline(cin,age);
+    while(age.empty() || !validateAge(age)) {
         cout << "Age cannot be empty. Please try again:\n";
-        cin >> age;
+        cin.ignore();
+        getline(cin,age);
     }
     //degrees
     int degreesNumber = SelectDegree();
@@ -336,34 +341,41 @@ void CreateResume(Database& db, string& id)
     {
         do{
             cout << "Enter the name of your Bachelor's degree (B.A.):" << endl;
-            cin >> degree1;
+            cin.ignore();
+            getline(cin,degree1);
         } while (degree1.empty());
     }
     if (degreesNumber >= 2 && degreesNumber <=3)
     {
         do {
             cout << "Enter the name of your  Master's degree (M.A.):" << endl;
-            cin >> degree2;
+            cin.ignore();
+            getline(cin,degree2);
         } while (degree2.empty());
     }
     if (degreesNumber == 3)
     {
         do{
             cout << "Enter the name of your Ph.D degree:" << endl;
-            cin >> degree3;
+            cin.ignore();
+            getline(cin,degree3);
         } while (degree3.empty());
     }
     cout << "Enter your work experience : \n";
-    cin >> work_experience;
+    cin.ignore();
+    getline(cin,work_experience);
     while(work_experience.empty()) {
         cout << "Work experience cannot be empty. Please try again:\n";
-        cin >> work_experience;
+        cin.ignore();
+        getline(cin,work_experience);
     }
     cout << "Enter the years of experience you have in the work : \n";
-    cin >> years_of_experience;
+    cin.ignore();
+    getline(cin,years_of_experience);
     while(years_of_experience.empty()) {
         cout << "Years of experience cannot be empty. Please try again:\n";
-        cin >> years_of_experience;
+        cin.ignore();
+        getline(cin,years_of_experience);
     }
     string confirm;
     do {
