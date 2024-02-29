@@ -4,42 +4,89 @@
 #include "candidate.h"
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <string>
+#include <vector>
+#include <limits>
 #include "iostream"
 using namespace SQLite;
 using namespace std;
 enum SearchMenu{VIEW_ALL_JOBS = '1', SEARCH_BY_CATEGORY, BACK_TO_CANDIDATE_MENU};
 enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};
-enum EmployerMenu{PUBLISH_JOB = '1', VIEW_ALL_JOBS_YOU_PUBLISHED, VIEW_CANDIDATES_PROFILES, LOG_OUT_E};
+enum EmployerMenu{PUBLISH_JOB = '1',DELETE_JOB,EDIT_JOB, VIEW_ALL_JOBS_YOU_PUBLISHED,EDIT_PROFILE_EMP,FILTER,SEND_INVITATION,VIEW_INVITATION, LOG_OUT_E};
 enum MainMenu{REGISTER = '1', LOGIN,FORGOT_PASSWORD,EXIT};
 
 void EditDeleteMenu() {
-    string choice, id;
+    char option;
+    string id;
     cout << "Please enter your choice : \n"
             "1. Edit jobs.\n"
             "2. Delete Jobs.\n"
             "Back - press any char";
-    cin >> choice;
-    if(choice == "1"){
+    option = UserChoice();
+    if(option == '1'){
         cout << "Please enter job id : \n";
         cin >> id;
     }
-    if(choice == "2"){
+    if(option == '2'){
         cout << "Please enter job id : \n";
         cin >> id;
     }
-};
+}
 
-void CandidateMenu(Database& db , string& id) {
+void CandidateMenu(Database& db , string& id, string& name) {
     char option;
     while (true) {
-        cout << "1. Look for jobs.\n"
-                "2. Create your resume.\n"
-                "3. View all the jobs you submitted your resume.\n"
-                "4. View all the interview invitations you got.\n"
-                "5. Edit your profile.\n"
-                "6. Log out from the system.\n"
-                "Please enter your choice : \n";
-        cin >> option;
+        ChangeColor(0, 15);
+        cout << " ---------------------------------------------------------- \n";
+        cout << "| Welcome Back " << left << name << setw(43 - name.length()) <<  "!" << " |\n";
+        cout << "|                         JobSearch                        |\n";
+        cout << " ---------------------------------------------------------- \n";
+        cout << "|     1.  --------------------------------------------     |\n";
+        cout << "|        |";
+        ChangeColor(1, 15);
+        cout << "               Look for jobs                ";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------------     |\n";
+        cout << "|     2.  --------------------------------------------     |\n";
+        cout << "|        |";
+        ChangeColor(1, 15);
+        cout << "             Create your resume             ";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------------     |\n";
+        cout << "|     3.  --------------------------------------------     |\n";
+        cout << "|        |";
+        ChangeColor(1, 15);
+        cout << " View all the jobs you submitted your resume";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------------     |\n";
+        cout << "|     4.  --------------------------------------------     |\n";
+        cout << "|        |";
+        ChangeColor(1, 15);
+        cout << " View all the interview invitations you got ";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------------     |\n";
+        cout << "|     5.  --------------------------------------------     |\n";
+        cout << "|        |";
+        ChangeColor(1, 15);
+        cout << "             Edit your profile              ";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------------     |\n";
+        cout << "|     6.  --------------------------------------------     |\n";
+        cout << "|        |";
+        ChangeColor(4, 15);
+        cout << "                   Log out                  ";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------------     |\n";
+        cout << " ---------------------------------------------------------- \n";
+        ChangeColor(1, 0);
+        cout << "Please enter your choice: " << endl;
+        ChangeColor(7,0);
+        option = UserChoice();
         switch (option) {
             case LOOK_FOR_JOBS:
                 LookForJobsMenu(db, id);
@@ -51,8 +98,10 @@ void CandidateMenu(Database& db , string& id) {
                 ViewAllSubmittedJobs(db, id);
                 break;
             case VIEW_INTERVIEW_INVITATIONS:
+                RejectAcceptInterviewInvitation(db,id);
                 break;
             case EDIT_PROFILE:
+                editProfile(db, id);
                 break;
             case LOG_OUT_C:
                 return;
@@ -61,30 +110,87 @@ void CandidateMenu(Database& db , string& id) {
         }
     }
 }
-void EmployerMenu(Database& db, string& id) {
+void EmployerMenu(Database& db, string& id, string& name) {
     char option;
-    bool flagForContinue = false;
-    while (!flagForContinue)
+    while (true)
     {
-        cout << "1. Publish a job.\n"
-                "2. View all the jobs you have already published.\n"
-                "3. View all the candidates who submitted their resumes for the jobs you published.\n"
-                "4. Log out. \n"
-                "Please enter your choice!\n";
-        cin >> option;
+        ChangeColor(0, 15);
+        cout << " ---------------------------------------------------------- \n";
+        cout << "| Welcome Back " << left << name << setw(43 - name.length()) <<  "!" << " |\n";
+        cout << "|                         JobSearch                        |\n";
+        cout << " ---------------------------------------------------------- \n";
+        cout << "|     1.  --------------------------------------------     |\n";
+        cout << "|        |";
+        ChangeColor(1, 15);
+        cout << "               Publish a job                ";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------------     |\n";
+        cout << "|     2.  --------------------------------------------     |\n";
+        cout << "|        |";
+        ChangeColor(1, 15);
+        cout << "         View all the published jobs        ";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------------     |\n";
+        cout << "|     3.  --------------------------------------------     |\n";
+        cout << "|        |";
+        ChangeColor(1, 15);
+        cout << " View all the profiles who submitted resume ";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------------     |\n";
+        cout << "|     4.  --------------------------------------------     |\n";
+        cout << "|        |";
+        ChangeColor(1, 15);
+        cout << "           Send interview invitation        ";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------------     |\n";
+        cout << "|     5.  --------------------------------------------     |\n";
+        cout << "|        |";
+        ChangeColor(1, 15);
+        cout << " View all the interview invitations you sent";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------------     |\n";
+        cout << "|     6.  --------------------------------------------     |\n";
+        cout << "|        |";
+        ChangeColor(4, 15);
+        cout << "                   Log out                  ";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------------     |\n";
+        cout << " ---------------------------------------------------------- \n";
+        ChangeColor(1, 0);
+        cout << "Please enter your choice: " << endl;
+        ChangeColor(7,0);
+        option = UserChoice();
         switch (option)
         {
             case PUBLISH_JOB:
                 PostJob(db,id);
                 break;
+            case DELETE_JOB:
+                DeleteJob(db,id);
+                break;
+            case EDIT_JOB:
+                EditJob(db,id);
+                break;
             case VIEW_ALL_JOBS_YOU_PUBLISHED:
                 FetchAllJobs(db,id);
                 break;
-            case VIEW_CANDIDATES_PROFILES:
+            case FILTER:
+                FilterCandidateResume(db,id);
+                break;
+            case SEND_INVITATION:
+                SendInterviewInvitation(db,id);
+                break;
+            case VIEW_INVITATION:
+                ViewAllInterviewInvitation(db,id);
                 break;
             case LOG_OUT_E:
-                flagForContinue = true;
-                break;
+                return;
             default:
                 cout << "You enter an illegal option, please try again!" << endl;
         }
@@ -93,15 +199,47 @@ void EmployerMenu(Database& db, string& id) {
 void MainMenu(Database& db)
 {
     char option;
-    bool illegalOption = false;
-    while (!illegalOption)
+    while (true)
     {
-        cout << "1. Register.\n"
-                "2. Login.\n"
-                "3. Forgot password.\n"
-                "4. Exit.\n"
-                "Please enter your choice:\n";
-        cin >> option;
+        ChangeColor(0, 15);
+             cout << " --------------------------------------------- \n"
+                     "|                  JobSearch                  |\n"
+                     " --------------------------------------------- \n"
+                     "|     1.  -----------------------------       |\n"
+                     "|        |";
+        ChangeColor(1, 15);
+        cout << "         Register            ";
+        ChangeColor(0, 15);
+        cout << "|      |\n"
+
+                     "|         -----------------------------       |\n"
+                     "|     2.  -----------------------------       |\n"
+                     "|        |";
+        ChangeColor(1,15);
+        cout << "          Login              ";
+        ChangeColor(0, 15);
+        cout << "|      |\n"
+                     "|         -----------------------------       |\n"
+                     "|     3.  -----------------------------       |\n"
+                     "|        |";
+        ChangeColor(1, 15);
+        cout << "      Forgot password        ";
+        ChangeColor(0, 15);
+        cout << "|      |\n"
+                     "|         -----------------------------       |\n"
+                     "|     4.  -----------------------------       |\n"
+                     "|        |";
+        ChangeColor(4, 15);
+        cout << "           Exit              ";
+        ChangeColor(0, 15);
+        cout << "|      |\n"
+                     "|         -----------------------------       |\n"
+                     " --------------------------------------------- \n";
+        ChangeColor(1, 0);
+        cout << "Please enter your choice: " << endl;
+        ChangeColor(7,0);
+        option = UserChoice();
+        //system("cls");
         switch (option)
         {
 
@@ -113,14 +251,15 @@ void MainMenu(Database& db)
 
             case LOGIN:
             {
-                string result = Login(db);
-                if (result == "ERROR")
+                string name;
+                string id = Login(db, name);
+                if (id == "b")
                     break;
-                string role = GetUserRole(db,result);
+                string role = GetUserRole(db,id);
                 if(role == "employer")
-                    EmployerMenu(db,result);
+                    EmployerMenu(db,id,name);
                 else
-                    CandidateMenu(db,result);
+                    CandidateMenu(db,id,name);
                 break;
             }
             case FORGOT_PASSWORD:
@@ -129,11 +268,7 @@ void MainMenu(Database& db)
                 break;
             }
             case EXIT:
-            {
-                illegalOption = true;
-                break;
-            }
-
+                return;
             default:
                 cout << "You enter an illegal option, please try again!" << endl;
         }
@@ -143,23 +278,58 @@ void LookForJobsMenu(Database& db, string& id)
 {
     char option;
     while (true) {
-        cout << "1. View all the jobs.\n"
-                "2. Search by category.\n"
-                "3. Back.\n";
-        cin >> option;
+        ChangeColor(0, 15);
+        cout << " ---------------------------------------------------- \n"
+                "|                      JobSearch                     |\n"
+                " ---------------------------------------------------- \n"
+                "|     1.  --------------------------------------     |\n"
+                "|        |";
+        ChangeColor(1, 15);
+        cout << "         View all the jobs            ";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------     |\n";
+        cout << "|     2.  --------------------------------------     |\n"
+                "|        |";
+        ChangeColor(1, 15);
+        cout << "         Search by category           ";
+        ChangeColor(0, 15);
+        cout << "|    |\n";
+        cout << "|         --------------------------------------     |\n";
+        cout << "|     3.  --------------------------------------     |\n"
+                "|        |";
+        ChangeColor(1, 15);
+        cout << "               Back                   ";
+        ChangeColor(0, 15);
+        cout << "|    |\n"
+                "|         --------------------------------------     |\n"
+                " ---------------------------------------------------- \n";
+        ChangeColor(1, 0);
+        cout << "Please enter your choice: " << endl;
+        ChangeColor(7,0);
+        option = UserChoice();
+        vector<string> filteredJobs;
         switch (option)
         {
             case VIEW_ALL_JOBS:
             {
                 ViewAllJobs(db);
-                string jobId = SelectJob(db, id);
+                string jobId = SelectJob(db, id, filteredJobs);
                 if (jobId != "ERROR" && jobId != "b")
                     SubmitResume(db, id, jobId);
                 break;
             }
             case SEARCH_BY_CATEGORY:
-                SearchByCategory(db);
+            {
+                string choice = SearchByCategory(db, filteredJobs);
+                if (choice != "b" && choice != "ERROR")
+                {
+                    string jobId = SelectJob(db, id, filteredJobs);
+                    if (jobId != "b" && jobId != "ERROR")
+                        SubmitResume(db, id, jobId);
+                }
                 break;
+            }
             case BACK_TO_CANDIDATE_MENU:
                 return;
             default:
@@ -167,3 +337,13 @@ void LookForJobsMenu(Database& db, string& id)
         }
     }
 }
+
+char UserChoice()
+{
+    string optionInString;
+    getline(cin >> ws, optionInString);
+    if (optionInString.length() != 1)
+        return '0';
+    return optionInString[0];
+}
+

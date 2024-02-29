@@ -5,6 +5,7 @@
 #include "candidate.h"
 #include "employer.h"
 #include "sqlite3.h"
+#include "TableCreation.h"
 enum ConsoleColor {
     FOREGROUND_BLUE      = 0x0001,
     FOREGROUND_GREEN     = 0x0002,
@@ -21,7 +22,9 @@ using namespace SQLite;
 int main()
 {
     Database db("db.db", OPEN_READWRITE|OPEN_CREATE);
+    CreatTables(db);
     MainMenu(db);
+    cout << "GOODBYE\n";
     return 0;
 }
 
