@@ -529,7 +529,7 @@ bool printPendingCandidates(Database&db,string &job_idSelected)
     }
     return true;
 }
-void FillterCandidateResume(Database& db, string& id) {
+void FilterCandidateResume(Database& db, string& id) {
 
     while (true)
     {

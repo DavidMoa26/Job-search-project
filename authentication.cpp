@@ -385,7 +385,7 @@ string Login(Database& db, string& name)
         if (EnterIdTillValid(id) == BACK)
             return BACK;
 
-        cout << "Enter Your password (must be between 6-12 digits,must contains lowercase,uppercase,numbers).\n";
+        cout << "Enter Your password (must be between 6-12 digits, without spaces):\n";
         do {
             getline(cin >> ws, password);
         } while (!validPassword(password));

@@ -148,13 +148,7 @@ char AnswerTheFilter(vector<string>& answerForFilter)
         case SEARCH_BY_LOCATION: {
             string locationChoice;
             cout << "Please enter the location:" << endl;
-            bool firstIter = true;
-            do {
-                if (!firstIter)
-                    cout << "You entered an invalid location, try again   |   Back - 'b'." << endl;
-                firstIter = false;
-                getline(cin >> ws, locationChoice);
-            } while (!CheckIfNameIsLetters(locationChoice));
+            getline(cin >> ws, locationChoice);
             answerForFilter.push_back(locationChoice);
             return SEARCH_BY_LOCATION;
         }
