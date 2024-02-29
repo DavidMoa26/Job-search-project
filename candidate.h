@@ -19,12 +19,16 @@ string SelectJob(Database& db, string& id, vector<string>& filteredJobs);
 string SearchByCategory(Database& db, vector<string>& filteredJobs);
 char SelectFilter();
 char AnswerTheFilter(vector<string>& answerForFilter);
-
+bool CheckIfFullNameIsLetters(string& name);
 //Resumes
 void CreateResume(Database& db, string& id);
 int SelectDegree();
 
 // Resume submissions
+bool CheckIfOnlyLettersOrSpace(string& str);
+bool strIsValid(string &str, const string& strMessage);
+string EnterTillValid(string& str, const string& strMessage);
+string EnterYearsOfExperienceTillValid(string& age);
 void SubmitResume(Database& db, string& id, string& jobId);
 void ViewAllSubmittedJobs(Database& db, string& candidate_id);
 

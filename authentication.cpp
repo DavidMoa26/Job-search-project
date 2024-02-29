@@ -30,7 +30,7 @@ bool NotValidSpace(string& string)
     for(char i : string)
         if(i == ' ')
         {
-            cout << "You can't enter a apace!\n";
+            cout << "You can't enter a space!\n";
             return false;
         }
     return true;
@@ -183,18 +183,23 @@ string EnterNameTillValid(string& name)
 //***************************************************
 bool validateAge(string &age) {
 
-    int ageNumber = stoi(age);
-    if(age.length() == 0 || ageNumber < 18 || ageNumber > 99 || !NotValidSpace(age))
+    if(!CheckIfIdIsDigits(age))
     {
-        cout << "You entered an invalid age. Age must be between 18 - 99. Please try again.\n";
+        cout << "You entered an invalid age (Must be between 18 - 99) Please try again.\n";
+        return false;
+    }
+    int ageNumber = stoi(age);
+    if(ageNumber < 18 || ageNumber > 99 || !NotValidSpace(age))
+    {
+        cout << "You entered an invalid age (Must be between 18 - 99) Please try again.\n";
         return false;
     }
     return true;
 }
 string EnterAgeTillValid(string& age)
 {
+    cout << "Please enter your age (18 - 99)   |   Back - 'b':\n";
     do {
-        cout << "Please enter your age (18 - 99)   |   Back - 'b':\n";
         getline(cin >> ws, age);
         if (age == BACK)
             return BACK;
@@ -218,7 +223,7 @@ bool validFreeText(string &freeText)
 string EnterFreeTextTillValid(string& freeText)
 {
     do {
-        cout << "Please some information about yourself   |   Back - 'b':\n";
+        cout << "Please enter some information about yourself   |   Back - 'b':\n";
         getline(cin >> ws, freeText);
         if (freeText == BACK)
             return BACK;
@@ -231,36 +236,36 @@ string EnterFreeTextTillValid(string& freeText)
 //***************************************************
 string selectQuestion(string &question, string &answer)
 {
-        cout << "Please select a number of question:\n";
-        cout << "1. What is the name of your father?\n"
-             << "2. What is the name of your mother?\n"
-             << "3. What is the name of the school you attended?\n"
-             << "4. What year were you born?\n"
-             << "5. What is your favorite food?\n"
-             << "6. Back.\n";
-        char option;
-        option = UserChoice();
-        switch (option) {
-            case QUESTION_1:
-                question = "What is the name of your father?";
-                break;
-            case QUESTION_2:
-                question = "What is the name of your mother?";
-                break;
-            case QUESTION_3:
-                question = "What is the name of the school you attended?";
-                break;
-            case QUESTION_4:
-                question = "What year were you born?";
-                break;
-            case QUESTION_5:
-                question = "What is your favorite food?";
-                break;
-            case GO_BACK:
-                return BACK;
-            default:
-                cout << "You entered an illegal option. Please try again!\n";
-        }
+    cout << "Please select a number of question:\n";
+    cout << "1. What is the name of your father?\n"
+         << "2. What is the name of your mother?\n"
+         << "3. What is the name of the school you attended?\n"
+         << "4. What year were you born?\n"
+         << "5. What is your favorite food?\n"
+         << "6. Back.\n";
+    char option;
+    option = UserChoice();
+    switch (option) {
+        case QUESTION_1:
+            question = "What is the name of your father?";
+            break;
+        case QUESTION_2:
+            question = "What is the name of your mother?";
+            break;
+        case QUESTION_3:
+            question = "What is the name of the school you attended?";
+            break;
+        case QUESTION_4:
+            question = "What year were you born?";
+            break;
+        case QUESTION_5:
+            question = "What is your favorite food?";
+            break;
+        case GO_BACK:
+            return BACK;
+        default:
+            cout << "You entered an illegal option. Please try again!\n";
+    }
     cout << "Please enter your answer for \"" << question << "\":\n";
     getline(cin >> ws, answer);
     return ALL_GOOD;
@@ -340,11 +345,12 @@ void ChangePassword (Database& db, string& id) {
     }
 }
 void ForgotPassword(Database& db) {
+
     string id;
     do {
         cout << "Enter Your ID (must be 9 digits)   |   Back - 'b':\n";
-        cin.ignore();
-        getline(cin, id);
+
+        getline(cin >> ws, id);
         if (id == BACK)
             return;
     } while (!validateId(id));
@@ -380,38 +386,62 @@ string Login(Database& db, string& name)
         cout << "Users table does not exist.\n";
         return "ERROR";
     }
-    try {
-        string id, password;
-        if (EnterIdTillValid(id) == BACK)
-            return BACK;
 
-        cout << "Enter Your password (must be between 6-12 digits, without spaces):\n";
-        do {
-            getline(cin >> ws, password);
-        } while (!validPassword(password));
-
-        Statement query(db, "SELECT password,role FROM users WHERE id = ?");
-        query.bind(1, stoi(id));
-        if (query.executeStep())
+    string id, password;
+    while (true)
+    {
+        try
         {
-            string dbPassword = query.getColumn(0).getText();
-            string role = query.getColumn(1).getText();
-            if (dbPassword == password) {
-                return id;
-            } else {
-                cout << "Invalid password \n";
-                return "ERROR";
+            if (EnterIdTillValid(id) == BACK)
+                return BACK;
+
+            bool validPasswordEntered = false; // Flag to track if a valid password is entered
+
+            while (!validPasswordEntered)
+            {
+                cout << "Enter Your password (must be between 6-12 characters, without spaces):\n";
+                do
+                {
+                    getline(cin >> ws, password);
+                }
+                while (!validPassword(password));
+
+                Statement query(db, "SELECT password,role,name FROM users WHERE id = ?");
+                query.bind(1, stoi(id));
+                if (query.executeStep())
+                {
+                    string dbPassword = query.getColumn(0).getText();
+                    string role = query.getColumn(1).getText();
+                    name = query.getColumn(2).getText();
+                    if (dbPassword == password)
+                    {
+                        return id;
+                    }
+                    else
+                    {
+                        cout << "Invalid password \n";
+                        // Allow the user to try again from the top of the password loop
+                        break;
+                    }
+                }
+                else
+                {
+                    cout << "User ID not found.\n";
+                    // Allow the user to try again from the top of the password loop
+                    break;
+                }
             }
         }
-        else {
-            cout << "User ID not found.\n";
+        catch (exception& e)
+        {
+            cerr << "SQLite exception: " << e.what() << endl;
             return "ERROR";
         }
-    } catch(exception& e) {
-        cerr << "SQLite exception: " << e.what() << endl;
-        return "ERROR";
     }
 }
+
+
+
 //***************************************************
 string GetUserRole(Database& db, string& id) {
     try {
@@ -426,4 +456,3 @@ string GetUserRole(Database& db, string& id) {
     }
     return "Error";
 }
-
