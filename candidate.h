@@ -1,44 +1,45 @@
 #ifndef MAIN_CPP_CANDIDATE_H
 #define MAIN_CPP_CANDIDATE_H
 #include <SQLiteCpp/SQLiteCpp.h>
-
-
+#include <iomanip>
+#include <cstdlib>
+#include <vector>
 using namespace SQLite;
 
 // Designing
-void ChangeColor(int color);
+void ChangeColor(int textColor,int backgroundColor);
 void printLine(int width, char borderChar, char fillChar);
 void printRow(string text, int width, char borderChar);
 
 // Jobs
-void PrintJob(string& jobId, string& companyName, string& location, string& position, string& scope, string& experience);
+void PrintJobMinDetails(string& jobId, string& companyName, string& location, string& position, string& scope, string& experience);
+void PrintJobMaxDetails(string& jobId, string& companyName, string& location, string& position, string& scope, string& experience, string& description, string& salary);
 void ViewAllJobs(Database& db);
-string SelectJob(Database& db, string& id);
-void SearchByCategory(Database& db);
-string* SelectFilter(Database& db);
-
+string SelectJob(Database& db, string& id, vector<string>& filteredJobs);
+string SearchByCategory(Database& db, vector<string>& filteredJobs);
+char SelectFilter();
+char AnswerTheFilter(vector<string>& answerForFilter);
 //Resumes
-bool ResumesTableExists(Database& db);
-void CreateResumeTable(Database& db);
-void InsertResumeToTable(Database& db, string& id, string& full_name, string& age, string& degree1, string& degree2, string& degree3, string& work_experience, string& years_of_experience);
 void CreateResume(Database& db, string& id);
 int SelectDegree();
+bool validateYearsofExperience(string &);
 
 // Resume submissions
-bool ResumeSubmissionsTableExists (Database& db);
-void CreateResumeSubmissionsTable(Database& db);
-void InsertSubmitToTable(Database& db, string& id, string& jobId);
+bool CheckIfOnlyLettersOrSpace(string& str);
+bool strIsValid(string &str, const string& strMessage);
+string EnterTillValid(string& str, const string& strMessage);
+string EnterYearsOfExperienceTillValid(string& age);
 void SubmitResume(Database& db, string& id, string& jobId);
 void ViewAllSubmittedJobs(Database& db, string& candidate_id);
-void ViewAllInterviewQuestions(Database&, string&);
 
-
+//Edit profile
 void editName(Database&,  string&);
 void editAge(Database&,  string&);
-void editPassword(Database&,  string&,string&);
+void editPassword(Database&,  string&);
 void editFreeText(Database&,  string&);
-void editQuestion(Database&,  string&,string &);
+void editQuestion(Database&,  string&);
 void editProfile(Database&, string&);
 
 void RejectAcceptInterviewInvitation(Database&db,string&id);
+void ViewAllInterviewQuestions(Database&, string&);
 #endif //MAIN_CPP_CANDIDATE_H
