@@ -10,8 +10,8 @@
 using namespace SQLite;
 using namespace std;
 enum SearchMenu{VIEW_ALL_JOBS = '1', SEARCH_BY_CATEGORY, BACK_TO_CANDIDATE_MENU};
-enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE, LOG_OUT_C};
-enum EmployerMenu{PUBLISH_JOB = '1',DELETE_JOB,EDIT_JOB, VIEW_ALL_JOBS_YOU_PUBLISHED,EDIT_PROFILE_EMP,FILTER,SEND_INVITATION,VIEW_INVITATION, LOG_OUT_E};
+enum CandidateMenu{LOOK_FOR_JOBS = '1', CREATE_RESUME, VIEW_JOBS_SUBMITTED, VIEW_INTERVIEW_INVITATIONS, EDIT_PROFILE,VIEW_QUESTIONS, LOG_OUT_C};
+enum EmployerMenu{PUBLISH_JOB = '1',DELETE_JOB,EDIT_JOB, VIEW_ALL_JOBS_YOU_PUBLISHED,FILTER,EDIT_PROFILE_EMP,SEND_INVITATION,VIEW_INVITATION, LOG_OUT_E};
 enum MainMenu{REGISTER = '1', LOGIN,FORGOT_PASSWORD,EXIT};
 
 
@@ -39,12 +39,14 @@ void CandidateMenu(Database& db , string& id, string& name) {
              << "|        |             Edit your profile              |    |\n"
              << "|         --------------------------------------------     |\n"
              << "|     6.  --------------------------------------------     |\n"
+             << "|        |           View interview questions              |\n"
+             << "|         --------------------------------------------     |\n"
+             << "|     7.  --------------------------------------------     |\n"
              << "|        |                   Log out                  |    |\n"
              << "|         --------------------------------------------     |\n"
              << " ---------------------------------------------------------- \n";
 
         cout << "Please enter your choice: " << endl;
-        ChangeColor(7,0);
         option = UserChoice();
         switch (option) {
             case LOOK_FOR_JOBS:
@@ -62,6 +64,8 @@ void CandidateMenu(Database& db , string& id, string& name) {
             case EDIT_PROFILE:
                 editProfile(db, id);
                 break;
+            case VIEW_QUESTIONS:
+                ViewAllInterviewQuestions(db,id);
             case LOG_OUT_C:
                 return;
             default:
@@ -106,7 +110,6 @@ void EmployerMenu(Database& db, string& id, string& name) {
         cout << " ---------------------------------------------------------- \n";
 
         cout << "Please enter your choice: " << endl;
-        ChangeColor(7,0);
         option = UserChoice();
         switch (option)
         {
@@ -122,10 +125,11 @@ void EmployerMenu(Database& db, string& id, string& name) {
             case VIEW_ALL_JOBS_YOU_PUBLISHED:
                 FetchAllJobs(db,id);
                 break;
-            case EDIT_PROFILE:
-                editProfile(db, id);
             case FILTER:
                 FilterCandidateResume(db,id);
+                break;
+            case EDIT_PROFILE_EMP:
+                editProfile(db, id);
                 break;
             case SEND_INVITATION:
                 SendInterviewInvitation(db,id);
@@ -252,7 +256,8 @@ void LookForJobsMenu(Database& db, string& id)
 char UserChoice()
 {
     string optionInString;
-    getline(cin >> ws, optionInString);
+    fflush(stdin);
+    getline(cin, optionInString);
     if (optionInString.length() != 1)
         return '0';
     return optionInString[0];

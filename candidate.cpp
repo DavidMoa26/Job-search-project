@@ -76,7 +76,8 @@ string SelectJob(Database& db, string& id, vector<string>& filteredJobs)
         if (!firstIter)
             cout << "You entered an invalid selection, try again   |   Back - 'b'." << endl;
         firstIter = false;
-        getline(cin >> ws, jobIdChoice);
+        fflush(stdin);
+        getline(cin, jobIdChoice);
         if (jobIdChoice == "b")
             return "b";
     } while (!CheckIfIdIsDigits(jobIdChoice));
@@ -302,12 +303,12 @@ bool strIsValid(string &str, const string& strMessage) {
     }
     return true;
 }
-
 string EnterTillValid(string& str, const string& strMessage)
 {
     cout << "Please enter your " << strMessage << " (must contain only letters and not more than 50 letters)   |   Back - 'b':\n";
     do {
-        getline(cin >> ws, str);
+        fflush(stdin);
+        getline(cin, str);
         if (str == BACK)
             return BACK;
     } while (!strIsValid(str, strMessage));
@@ -330,8 +331,10 @@ bool validateYearsOfExperience(string & years_of_experience)
 }
 string EnterYearsOfExperienceTillValid(string& years_of_experience)
 {
+    cout << "Please enter your years of experience(Must be between 0 - 50)   |   Back - 'b'.\n";
     do {
-        getline(cin >> ws, years_of_experience);
+        fflush(stdin);
+        getline(cin, years_of_experience);
         if (years_of_experience == BACK)
             return BACK;
     } while (!validateYearsOfExperience(years_of_experience));
@@ -344,16 +347,22 @@ void CreateResume(Database& db, string& id)
 {
     string choice;
     cout << "Create your resume - press 'r'.   |   Back - press 'b'." << endl;
-    getline(cin >> ws,choice);
-    if (choice == "b")
-        return;
+    bool firstIter = true;
+    do
+    {
+        if (!firstIter)
+            cout << "You entered an invalid choice, please try again   |   Back - 'b'." << endl;
+        firstIter = false;
+        fflush(stdin);
+        getline(cin, choice);
+        if (choice == BACK)
+            return;
+    } while (choice!="r");
     string full_name, age, degree1, degree2, degree3, work_experience, years_of_experience;
     //FullName
     if(EnterTillValid(full_name, "full name") == BACK)
         return;
-
     //Age
-    cout << "Please enter your experience years (0 - 50)   |   Back - 'b':\n";
     if (EnterAgeTillValid(age) == BACK)
         return;
     //Degrees
@@ -377,7 +386,8 @@ void CreateResume(Database& db, string& id)
     string confirm;
     do {
         cout << "Confirm - press 'c'   |   Back - press 'b'." << endl;
-        getline(cin >> ws,confirm);
+        fflush(stdin);
+        getline(cin, confirm);
         if (confirm == "b")
             return;
     } while (confirm != "c");
@@ -418,7 +428,8 @@ void SubmitResume(Database& db, string& id, string& jobId)
     string choice;
     do {
         cout << "Submit your resume - press 's'   |   Back - press 'b'." << endl;
-        getline(cin >> ws,choice);
+        fflush(stdin);
+        getline(cin, choice);
         if (choice == "b")
             return;
     } while (choice != "s");
@@ -627,4 +638,74 @@ void RejectAcceptInterviewInvitation(Database&db,string&id)
         }
     }
 }
+void ViewAllInterviewQuestions(Database& db, string& candidate_id) {
+    string question,answer1,answer2,answer3,answer4,employer_id,employer_name,question_id , question_choice,answer_choice;
+    bool flag_query1 = false;
+    bool flag_query2 = false;
+    try {
+        Statement query1(db, "SELECT question, answer1, answer2, answer3, answer4, employer_id, id FROM tests WHERE candidate_id = ? AND grade IS NULL");
+        query1.bind(1, stoi(candidate_id));
+        while (query1.executeStep()) {
+            flag_query1 = true;
+            question = query1.getColumn(0).getText();
+            answer1 = query1.getColumn(1).getText();
+            answer2 = query1.getColumn(2).getText();
+            answer3 = query1.getColumn(3).getText();
+            answer4 = query1.getColumn(4).getText();
+            employer_id = query1.getColumn(5).getText();
+            question_id = query1.getColumn(6).getText();
 
+            cout << "Question number : " <<question_id << "\n" << question <<"\n"
+                 << "1. "<< answer1 << "\n"
+                 << "2. "<< answer2 << "\n"
+                 << "3. "<< answer3 << "\n"
+                 << "4. "<< answer4 << "\n"
+                 << " ===================================== \n \n";
+        }
+        if (!flag_query1) {
+            cout << "No interview questions.\n";
+            return;
+        }
+
+        cout << "Enter number of question you want answer : \n";
+        fflush(stdin);
+        getline(cin, question_choice);
+        try {
+            Statement query2(db,"SELECT id,correct_answer FROM tests WHERE id = ?");
+            query2.bind(1, stoi(question_choice));
+            while (query2.executeStep()) {
+                flag_query2 = true;
+                string storedCorrectAnswer = query2.getColumn(1).getText();
+                cout << "Enter the answer 1-4 : \n";
+                fflush(stdin);
+                getline(cin, answer_choice);
+                if(storedCorrectAnswer == answer_choice) {
+                    int grade = 100;
+                    Statement query3(db,"UPDATE tests SET grade = ? WHERE id = ?");
+                    query3.bind(1, grade);
+                    query3.bind(2, stoi(question_choice));
+                    query3.exec();
+                    cout << "Correct\n";
+                }
+                else {
+                    int grade = 0;
+                    Statement query3(db,"UPDATE tests SET grade = ? WHERE id = ?");
+                    query3.bind(1, grade);
+                    query3.bind(2, stoi(question_choice));
+                    query3.exec();
+                    cout << "Wrong\n";
+                }
+            }
+            if(!flag_query2) {
+                cout << "Wrong question choice\n";
+            }
+        } catch(exception & e) {
+            cerr << "SQLite exception: " << e.what() << endl;
+        }
+
+    }
+    catch(exception & e)
+    {
+        cerr << "SQLite exception: " << e.what() << endl;
+    }
+}

@@ -19,10 +19,10 @@ string SelectJob(Database& db, string& id, vector<string>& filteredJobs);
 string SearchByCategory(Database& db, vector<string>& filteredJobs);
 char SelectFilter();
 char AnswerTheFilter(vector<string>& answerForFilter);
-bool CheckIfFullNameIsLetters(string& name);
 //Resumes
 void CreateResume(Database& db, string& id);
 int SelectDegree();
+bool validateYearsofExperience(string &);
 
 // Resume submissions
 bool CheckIfOnlyLettersOrSpace(string& str);
@@ -41,4 +41,5 @@ void editQuestion(Database&,  string&);
 void editProfile(Database&, string&);
 
 void RejectAcceptInterviewInvitation(Database&db,string&id);
+void ViewAllInterviewQuestions(Database&, string&);
 #endif //MAIN_CPP_CANDIDATE_H

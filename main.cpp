@@ -12,6 +12,8 @@ using namespace SQLite;
 
 int main()
 {
+    //string id = "", question = "", answer = "", newPassword = "";
+    //printForgotPasswordSection(0, id, question, answer, newPassword);
     Database db("db.db", OPEN_READWRITE|OPEN_CREATE);
     CreatTables(db);
     MainMenu(db);
