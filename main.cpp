@@ -1,33 +1,30 @@
-enum ConsoleColor
-{
-    FOREGROUND_BLUE      = 0x0001,
-    FOREGROUND_GREEN     = 0x0002,
-    FOREGROUND_RED       = 0x0004,
-    FOREGROUND_INTENSITY = 0x0008,
-    BACKGROUND_BLUE      = 0x0010,
-    BACKGROUND_GREEN     = 0x0020,
-    BACKGROUND_RED       = 0x0040,
-    BACKGROUND_INTENSITY = 0x0080
-};
-
 #include <iostream>
+#include "SQLiteCpp/SQLiteCpp.h"
 #include "authentication.h"
 #include "menus.h"
 #include "candidate.h"
 #include "employer.h"
-#include <SQLiteCpp/SQLiteCpp.h>
+#include "sqlite3.h"
 #include "TableCreation.h"
-
 
 using namespace std;
 using namespace SQLite;
+void printGoodbye() {
+    cout << "----------------------------------------------\n";
+    cout << "|                                            |\n";
+    cout << "|         Thank you for your time.           |\n";
+    cout << "|       Goodbye, and have a wonderful day!   |\n";
+    cout << "|                                            |\n";
+    cout << "----------------------------------------------\n";
+}
+
 
 int main()
 {
     Database db("db.db", OPEN_READWRITE|OPEN_CREATE);
     CreatTables(db);
     MainMenu(db);
-    cout << "GOODBYE\n";
+    printGoodbye();
+
     return 0;
 }
-
