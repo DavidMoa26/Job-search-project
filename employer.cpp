@@ -526,10 +526,9 @@ void SendInterviewInvitation(Database&db,string&id)
             if (!checkIfCandidateExist(db, select_id))
             {
                 break;
-            } else if (select_id == "B" || select_id == "b") {
+            } else
+                if (select_id == "B" || select_id == "b") {
                 break;
-            } else {
-                cout << "Invalid candidate ID, try again or enter 'B' to go back:\n ";
             }
 
             if (select_id == "B" || select_id == "b") {
@@ -555,8 +554,6 @@ void SendInterviewInvitation(Database&db,string&id)
                 cout << "4. Go Back" << endl;
                 fflush(stdin);
                 getline(cin,choice);
-
-
                 if (choice == "1")
                 {
                     status = "accepted";

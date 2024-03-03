@@ -759,8 +759,8 @@ void RejectAcceptInterviewInvitation(Database&db,string&id)
             while (true)
             {
                 char choice;
-                cout << "1. Accept" << endl;
-                cout << "2. Reject" << endl;
+                cout << "1. Confirms arrival" << endl;
+                cout << "2. Cancels arrival" << endl;
                 cout << "3. Go Back" << endl;
                 choice = UserChoice();
                 string status;
@@ -768,11 +768,11 @@ void RejectAcceptInterviewInvitation(Database&db,string&id)
                 while (flagToContinue) {
                     switch (choice) {
                         case '1':
-                            status = "accept";
+                            status = "confirms_arrival";
                             flagToContinue = false;
                             break;
                         case '2':
-                            status = "rejected";
+                            status = "cancels_arrival";
                             flagToContinue = false;
                             break;
                         case '3':
@@ -795,7 +795,7 @@ void RejectAcceptInterviewInvitation(Database&db,string&id)
                             "' AND candidate_id = '" + id + "'");
 
                     cout << "Invitation " << status << endl;
-
+                    return;
                 } catch (exception &e)
                 {
                     cerr << "SQLite exception: " << e.what() << endl;

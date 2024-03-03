@@ -351,7 +351,7 @@ bool CheckUserAnswer(Database& db, string& id, string& question, string& answer)
             int currentDetail = QUESTION_DETAIL;
             string newPassword = "";
             printForgotPasswordSection(currentDetail, id, question, answer, newPassword);
-            cout << "For change your password answer the question:\n";
+            cout << "For change your password answer the question.\n";
             fflush(stdin);
             getline(cin, answer);
             if (dbAnswer == answer) {

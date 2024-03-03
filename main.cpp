@@ -9,13 +9,21 @@
 
 using namespace std;
 using namespace SQLite;
-
+void printGoodbye() {
+    cout << " -------------------------------------------- \n";
+    cout << "|                                            |\n";
+    cout << "|         Thank you for your time.           |\n";
+    cout << "|       Goodbye and have a wonderful day!    |\n";
+    cout << "|                                            |\n";
+    cout << " -------------------------------------------- \n";
+}
 int main()
 {
     Database db("db.db", OPEN_READWRITE|OPEN_CREATE);
     CreatTables(db);
     MainMenu(db);
-    cout << "GOODBYE\n";
+    printGoodbye();
     return 0;
 }
+
 
