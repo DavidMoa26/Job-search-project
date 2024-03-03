@@ -3,7 +3,10 @@
 #include "candidate.h"
 #include "TableCreation.h"
 #include "menus.h"
+#include "vector"
 enum SecurityQuestions{QUESTION_1 = '1', QUESTION_2,QUESTION_3,QUESTION_4,QUESTION_5,QUESTION_6,QUESTION_7};
+enum  JobEdit {Company = 1,Location,Position,Description,Scope,Experience,Salary,GoBack
+};
 #define BACK "b"
 #define CONTINUE "0"
 #define ALL_GOOD "1"
@@ -66,7 +69,8 @@ string EnterCompanyNameTillValid(string& freeText)
 {
     do {
         cout << "Please enter company name about yourself   |   Back - 'b':\n";
-        getline(cin >> ws, freeText);
+        fflush(stdin);
+        getline(cin , freeText);
         if (freeText == BACK)
             return BACK;
     } while (!validFreeText(freeText));
@@ -249,7 +253,7 @@ void DeleteJob(Database& db,  string& employer_id) {
                 Statement deleteQuery(db, "DELETE FROM jobs_list WHERE id = ? AND employer_id = ?");
                 deleteQuery.bind(1, stoi(job_id)); // Convert job_id to integer and bind it
                 deleteQuery.bind(2, stoi(employer_id)); // Bind the employer ID
-                deleteQuery.executeStep(); // Execute the DELETE operation
+                deleteQuery.executeStep();
 
                 cout << "Job ID: " << job_id << " deleted." << endl;
             } else {
@@ -257,11 +261,32 @@ void DeleteJob(Database& db,  string& employer_id) {
                 cout << "Job ID: " << job_id << " not found in the table for the specified employer." << endl;
             }
 
+            DeleteJobFromSubmissions(db,job_id);
+
         } catch (const exception &e) {
             cerr << "SQLite exception: " << e.what() << endl;
         }
     }
 }
+
+void DeleteJobFromSubmissions(Database& db , string& job_id) {
+    try {
+        // First, check if there are any submissions to delete
+        Statement countQuery(db, "SELECT COUNT(*) FROM submission WHERE job_id = ?");
+        countQuery.bind(1, stoi(job_id));
+        if(countQuery.executeStep() && countQuery.getColumn(0).getInt() > 0) {
+            // If there are submissions, proceed to delete them
+            Statement deleteQuery(db, "DELETE FROM submission WHERE job_id = ?");
+            deleteQuery.bind(1, stoi(job_id));
+            deleteQuery.executeStep(); // Execute the delete operation
+            cout << "Submissions deleted.\n";
+        } else {
+            cout << "No submissions to delete for job_id: " << job_id << endl;
+        }
+    } catch (const exception &e) {
+        cerr << "SQLite exception: " << e.what() << endl;
+    }
+};
 
 bool isValidChoice(const string& choice) {
     // Check if choice is a single character and between '1' and '8'
@@ -301,123 +326,117 @@ bool checkIfCandidateExist(Database& db, string& id) {
     return false;
 }
 void EditJob(Database& db, string& employer_id) {
-    string job_id,companyName,location ,position,description,scope,experience,salary, choice;
     if (!JobsListExists(db)) {
         cout << "jobs_list table does not exist.\n";
         return;
     }
 
-    try {
-        if(!FetchAllJobs(db, employer_id))
-            return; // Display jobs first
-        cout << "Enter Job id - or press 0 to back :\n ";
-        while(true) {
-            getline(cin >> ws, job_id);
-            if(checkIfJobExist(db,job_id)) {
-                break;
-            }
-            else if (job_id == "0") {
-                break;
-            }
-            else {
-                cout << "Invalid Job id, try again - press 0 to back :\n ";
-            }
-        }
-
-        if (job_id == "0")
-            return;
-
-
-
-        Statement query(db, "SELECT * FROM jobs_list WHERE id = ?");
-        query.bind(1, stoi(job_id)); // Convert job_id to integer and bind it
-
-        while(query.executeStep()) {
-            companyName = query.getColumn(2).getText();
-            location = query.getColumn(3).getText();
-            position = query.getColumn(4).getText();
-            description = query.getColumn(5).getText();
-            scope = query.getColumn(6).getText();
-            experience = query.getColumn(7).getText();
-            salary = query.getColumn(8).getText();
-        }
-        cout << "1. Company : " << companyName << endl
-             << "2. Location : " << location << endl
-             << "3. Position : " << position << endl
-             << "4. Description : " << description << endl
-             << "5. Scope : " << scope << endl
-             << "6. Experience : " << experience << endl
-             << "7. Salary : " << salary << endl
-             << "8. Go Back " << endl;
-        cout << "Please select field to edit:\n";
-        while(true) {
-            getline(cin, choice);
-            if (isValidChoice(choice)) {
-                break;
-            }
-            else {
-                cout << "Invalid input. Please enter a number between 1 and 8.\n";
-            }
-        }
-
-        if (choice == "8")
-            return;
-
-
-        string newValue;
-        string sqlUpdateQuery = "UPDATE jobs_list SET ";
-
-        if (choice == "7") {
-            cout << "Enter new salary :\n";
-            cin >> newValue;
-            sqlUpdateQuery += "salary = ?";
-        } else if (choice == "6") {
-            cout << "Enter new experience requirement:\n";
-            cin >> newValue;
-            sqlUpdateQuery += "experience = ? ";
-        } else if (choice == "5") {
-            newValue = SelectScope();
-            sqlUpdateQuery += "scope = ? ";
-        }
-        else if (choice == "4") {
-            cout << "Enter new description :\n";
-            cin >> newValue;
-            sqlUpdateQuery += "description = ? ";
-        } else if (choice == "3") {
-            cout << "Enter new position :\n";
-            cin >> newValue;
-            sqlUpdateQuery += "position = ? ";
-        } else if (choice == "2") {
-            cout << "Enter new location :\n";
-            cin >> newValue;
-            sqlUpdateQuery += "location = ? ";
-        } else if (choice == "1") {
-            cout << "Enter new company name :\n";
-            cin >> newValue;
-            sqlUpdateQuery += "company_name = ? ";
-        }
-
-        sqlUpdateQuery += "WHERE id = ?";
-
+    while (true) {
+        string job_id, choice;
         try {
-            Statement editQuery(db, sqlUpdateQuery); // Correct variable name
-            if (choice == "7" || choice == "6") {
-                // For numeric fields, ensure the conversion and binding are correct
-                editQuery.bind(1, stoi(newValue)); // Convert and bind newValue for numeric fields
-            } else {
-                editQuery.bind(1, newValue); // Bind newValue directly for text fields
+
+
+            while (true)
+            {
+                if (!FetchAllJobs(db, employer_id))
+                    return; // Display jobs first
+                cout << "Enter Job id - or press b to go back :\n ";
+                getline(cin, job_id);
+                if (job_id == "b")
+                    break;
+
+
+                Statement query(db, "SELECT * FROM jobs_list WHERE id = ? AND employer_id = ?");
+                query.bind(1, stoi(job_id));
+                query.bind(2, stoi(employer_id));
+
+                if (!query.executeStep()) {
+                    cout << "Invalid Job id, try again.\n";
+                    continue;
+                }
+
+                string companyName = query.getColumn(2).getText();
+                string location = query.getColumn(3).getText();
+                string position = query.getColumn(4).getText();
+                string description = query.getColumn(5).getText();
+                string scope = query.getColumn(6).getText();
+                string experience = query.getColumn(7).getText();
+                string salary = query.getColumn(8).getText();
+
+                cout << "Job details:\n"
+                     << "1. Company : " << companyName << endl
+                     << "2. Location : " << location << endl
+                     << "3. Position : " << position << endl
+                     << "4. Description : " << description << endl
+                     << "5. Scope : " << scope << endl
+                     << "6. Experience : " << experience << endl
+                     << "7. Salary : " << salary << endl
+                     << "8. Go Back " << endl;
+
+                cout << "Please select field to edit:\n";
+                getline(cin, choice);
+                if (choice == "8")
+                    break;
+
+                string newValue;
+                string columnName;
+                switch (stoi(choice))
+                {
+                    case Company:
+                        columnName = "company_name";
+                        if (EnterCompanyNameTillValid(newValue) == BACK)
+                            return;
+                        break;
+                    case Location:
+                        columnName = "location";
+                        if (EnterCompanyLocationTillValid(newValue) == BACK)
+                            return;
+                        break;
+                    case Position:
+                        columnName = "position";
+                        if (EnterJobPositionTillValid(newValue) == BACK)
+                            return;
+                        break;
+                    case Description:
+                        columnName = "description";
+                        if (EnterJobDescriptionTillValid(newValue) == BACK)
+                            return;
+                        break;
+                    case Scope:
+                        columnName = "scope";
+                        newValue = SelectScope();
+                        break;
+                    case Experience:
+                        columnName = "experience";
+                        if (EnterYearsOfExperienceTillValid(newValue) == BACK)
+                            return;
+                        break;
+                    case Salary:
+                        columnName = "salary";
+                        if (EnterSalaryTillValid(newValue) == BACK)
+                            return;
+                        break;
+                    default:
+                        cout << "Invalid choice. Please enter a number between 1 and 8.\n";
+                        continue;
+                }
+
+                string sqlUpdateQuery = "UPDATE jobs_list SET " + columnName + " = ? WHERE id = ?";
+                Statement editQuery(db, sqlUpdateQuery);
+                if (columnName == "salary" || columnName == "experience")
+                    editQuery.bind(1, stoi(newValue));
+                else
+                    editQuery.bind(1, newValue);
+                editQuery.bind(2, stoi(job_id));
+                editQuery.exec();
+                cout << "Job updated successfully.\n";
             }
-            editQuery.bind(2, stoi(job_id)); // Ensure job_id is converted to int and bound correctly
-            editQuery.exec(); // Execute the update statement
-            cout << "Job updated successfully.\n";
         } catch (exception& e) {
             cerr << "SQLite exception: " << e.what() << endl;
         }
-
-    } catch(const exception& e) {
-        cerr << "SQLite exception: " << e.what() << endl;
     }
 }
+
 void printCandidateResume(Database&db ,string&selected_candidate_id)
 {
     // Query the resume table for the selected candidate's information
@@ -446,8 +465,42 @@ void printCandidateResume(Database&db ,string&selected_candidate_id)
         cout << "No resume found for Candidate ID: " << selected_candidate_id << endl;
     }
 }
+bool CandidateSentSubmissionToExistJob(Database& db,string& job_id,string& candidate_id) {
+    try {
+        // Prepare a SELECT statement to check if the ID exists
+        Statement query(db, "SELECT COUNT(1) FROM submission WHERE job_id = ? AND candidate_id = ?");
+
+        query.bind(1, job_id);
+        query.bind(2, candidate_id);
+
+        if (query.executeStep()) {
+            return query.getColumn(0).getInt() > 0;
+        }
+    } catch (const std::exception& e) {
+        cerr << "Error checking job ID in database: " << e.what() << endl;
+    }
+
+    return false;
+}
+bool SubmissionExist(Database& db,string& job_id) {
+    try {
+        // Prepare a SELECT statement to check if the ID exists
+        Statement query(db, "SELECT COUNT(1) FROM submission WHERE job_id = ?");
+
+        query.bind(1, stoi(job_id));
+
+        if (query.executeStep()) {
+            return query.getColumn(0).getInt() > 0;
+        }
+    } catch (const std::exception& e) {
+        cerr << "Error checking job ID in database: " << e.what() << endl;
+    }
+
+    return false;
+}
 void SendInterviewInvitation(Database&db,string&id)
 {
+    vector<string>l;
     string job_idSelected,grade,status;
     if(!ResumeSubmissionsTableExists(db)) {
         CreateResumeSubmissionsTable(db);
@@ -455,131 +508,148 @@ void SendInterviewInvitation(Database&db,string&id)
     while (true)
     {
         job_idSelected = FetchJobsEmployee(db, id);
-        if(!printPendingCandidates(db,job_idSelected,id))
+        if(job_idSelected == "B" || job_idSelected == "b")
             return;
-        string select_id;
-        cout << "Select the candidate ID you want to send interview invitation, or enter 'B' to go back:\n ";
-        while (true) {
+        while (true)
+        {
+            if (!printPendingCandidates(db, job_idSelected, id,l))
+                break;
+            string select_id;
+            cout << "Select the candidate ID you want to send interview invitation, or enter 'B' to go back:\n ";
+
             cin >> select_id;
-            if(checkIfCandidateExist(db,select_id)) {
+            if (!CandidateSentSubmissionToExistJob(db, job_idSelected, select_id))
+            {
+                cout << "This candidate dont submit for this job." << endl;
                 break;
             }
-            else if(select_id == "B" || select_id == "b"){
+            if (!checkIfCandidateExist(db, select_id))
+            {
                 break;
-            }
-            else {
+            } else if (select_id == "B" || select_id == "b") {
+                break;
+            } else {
                 cout << "Invalid candidate ID, try again or enter 'B' to go back:\n ";
             }
-        }
 
-
-        if (select_id == "B" || select_id == "b")
-        {
-            break;
-        }
-        printCandidateResume(db,select_id);
-        try {
-            Statement query(db,"SELECT grade FROM tests WHERE employer_id = ? AND candidate_id = ?;");
-            query.bind(1,id);
-            query.bind(2,select_id);
-            while (query.executeStep()) {
-                grade = query.getColumn(0).getText();
-            }
-        } catch(exception& e)
-        {
-            cerr << "SQLite exception: " << e.what() << endl;
-        }
-
-        char choice;
-
-        if(grade.empty()) {
-            cout << "1. Accept" << endl;
-            cout << "2. Reject" << endl;
-            cout << "3. Send question for test" << endl;
-            cout << "4. Go Back" << endl;
-            cin >> choice;
-
-            if (choice == '1')
-            {
-                status = "accepted";
-                if(!InterviewInvitationsExist(db))
-                    CreateInterviewInvitationTable(db);
-                insertToInterviewInvitationtable(db,select_id,job_idSelected,id);
-            }
-            else if(choice == '2')
-                status = "reject";
-            else if(choice == '3')
-            {
-                status = "pending";
-                cin.ignore();
-                string question, answer1,answer2,answer3, answer4,correct_answer;
-                cout << "Please enter your question : \n";
-                cin >> question;
-                cout << "Please enter your answer 1 : \n";
-                cin >> answer1;
-                cout << "Please enter your answer 2 : \n";
-                cin >> answer2;
-                cout << "Please enter your answer 3 : \n";
-                cin >> answer3;
-                cout << "Please enter your answer 4 : \n";
-                cin >> answer4;
-                cout << "Please enter the correct answer (1-4) : \n";
-                cin >> correct_answer;
-                insertDataToTestsTable(db,id,select_id,question,answer1,answer2,answer3,answer4,correct_answer);
-            }
-            else if (choice == '4')
-            {
+            if (select_id == "B" || select_id == "b") {
                 break;
+            }
+            printCandidateResume(db, select_id);
+            try {
+                Statement query(db, "SELECT grade FROM tests WHERE employer_id = ? AND candidate_id = ?;");
+                query.bind(1, id);
+                query.bind(2, select_id);
+                while (query.executeStep()) {
+                    grade = query.getColumn(0).getText();
+                }
+            } catch (exception &e) {
+                cerr << "SQLite exception: " << e.what() << endl;
+            }
+            if (grade.empty())
+            {
+                string choice;
+                cout << "1. Accept" << endl;
+                cout << "2. Reject" << endl;
+                cout << "3. Send question for test" << endl;
+                cout << "4. Go Back" << endl;
+                fflush(stdin);
+                getline(cin,choice);
+
+
+                if (choice == "1")
+                {
+                    status = "accepted";
+                    if (!InterviewInvitationsExist(db))
+                        CreateInterviewInvitationTable(db);
+                    insertToInterviewInvitationtable(db, select_id, job_idSelected, id);
+                }
+                else if (choice == "2")
+                    status = "reject";
+                else if (choice == "3")
+                {
+                    status = "pending";
+
+                    string question, answer1, answer2, answer3, answer4, correct_answer;
+                    cout << "Please enter your question : \n";
+                    fflush(stdin);
+                    getline(cin,question);
+                    cout << "Please enter your answer 1 : \n";
+                    fflush(stdin);
+                    getline(cin,answer1);
+                    cout << "Please enter your answer 2 : \n";
+                    fflush(stdin);
+                    getline(cin,answer2);
+                    cout << "Please enter your answer 3 : \n";
+                    fflush(stdin);
+                    getline(cin,answer3);
+                    cout << "Please enter your answer 4 : \n";
+                    fflush(stdin);
+                    getline(cin,answer4);
+                    cout << "Please enter the correct answer (1-4) : \n";
+                    fflush(stdin);
+                    getline(cin,correct_answer);
+                    while (true)
+                    {
+                        if(correct_answer != "1" || correct_answer != "2" || correct_answer != "3" || correct_answer != "4")
+                        {
+                            cout << "not valid number of correct answer it must be 1,2,3,4\n";
+                        } else
+                            break;
+                        cout << "Please enter the correct answer (1-4) : \n";
+                        fflush(stdin);
+                        getline(cin,correct_answer);
+                    }
+                    insertDataToTestsTable(db, id, select_id, question, answer1, answer2, answer3, answer4,
+                                           correct_answer);
+                } else if (choice == "4")
+                {
+                    break;
+                } else
+                {
+                    cout << "Invalid choice ." << endl;
+                    continue; // Restart the loop
+                }
             }
             else
             {
-                cout << "Invalid choice. Please enter '1' or '2'." << endl;
-                continue; // Restart the loop
+                string choice;
+                cout << "Grade is : " << grade << endl;
+                cout << "1. Accept" << endl;
+                cout << "2. Reject" << endl;
+                cout << "3. Go Back" << endl;
+                fflush(stdin);
+                getline(cin,choice);
+
+                if (choice == "1")
+                {
+                    status = "accepted";
+                    if (!InterviewInvitationsExist(db))
+                        CreateInterviewInvitationTable(db);
+                    insertToInterviewInvitationtable(db, select_id, job_idSelected, id);
+                } else if (choice == "2")
+                    status = "reject";
+
+                else if (choice == "3")
+                {
+                    break;
+                } else {
+                    cout << "Invalid choice" << endl;
+                    continue; // Restart the loop
+                }
             }
-        }
+            try {
+                // Update submission status based on choice
+                db.exec("UPDATE submission SET status = '" + status + "' WHERE job_id = '" + job_idSelected +
+                        "' AND candidate_id = '" + select_id + "'");
 
-        else {
-            cout << "Grade is : " << grade << endl;
-            cout << "1. Accept" << endl;
-            cout << "2. Reject" << endl;
-            cout << "3. Go Back" << endl;
-            cin >> choice;
-            choice = tolower(choice); // Convert choice to lowercase
+                cout << "Invitation " << status << " for Candidate ID: " << select_id << endl;
 
-            if (choice == '1')
-            {
-                status = "accepted";
-                if(!InterviewInvitationsExist(db))
-                    CreateInterviewInvitationTable(db);
-                insertToInterviewInvitationtable(db,select_id,job_idSelected,id);
+            } catch (exception &e) {
+                cerr << "SQLite exception: " << e.what() << endl;
             }
-            else if(choice == '2')
-                status = "reject";
-
-            else if (choice == '3')
-            {
-                break;
-            }
-            else
-            {
-                cout << "Invalid choice. Please enter '1' or '2'." << endl;
-                continue; // Restart the loop
-            }
-        }
-
-        try
-        {
-            // Update submission status based on choice
-            db.exec("UPDATE submission SET status = '" + status + "' WHERE job_id = '" + job_idSelected + "' AND candidate_id = '" + select_id + "'");
-
-            cout << "Invitation " << status << " for Candidate ID: " << select_id << endl;
-
-        } catch(exception& e)
-        {
-            cerr << "SQLite exception: " << e.what() << endl;
         }
     }
-
 }
 void ViewAllInterviewInvitation(Database& db, string&employer_id) {
     int count = 0;
@@ -651,7 +721,7 @@ string FetchJobsEmployee(Database& db, string& id) {
     }
     return job_id;
 }
-bool printPendingCandidates(Database&db,string &job_idSelected,string&employer_id)
+bool printPendingCandidates(Database&db,string &job_idSelected,string&id,vector<string>&candidate_str)
 {
     try {
         // Job ID exists, continue to count pending submissions
@@ -668,6 +738,7 @@ bool printPendingCandidates(Database&db,string &job_idSelected,string&employer_i
             if (status == "pending")
             {
                 cout << "Candidate ID: " << candidateId << endl;
+                candidate_str.push_back(candidateId);
                 ++count;
             }
         }
@@ -685,56 +756,66 @@ bool printPendingCandidates(Database&db,string &job_idSelected,string&employer_i
     return true;
 }
 void FilterCandidateResume(Database& db, string& id) {
-
-    while (true)
-    {
+    while (true) {
+        vector<string>candidates;
+        bool flag = true;
         int count = 0;
         string job_idSelected;
-        job_idSelected = FetchJobsEmployee(db, id); // Assuming FetchJobsEmployee returns the job_id
-        if(job_idSelected == "B")
+        job_idSelected = FetchJobsEmployee(db, id);
+        if (job_idSelected == "B")
             return;
-        if (!printPendingCandidates(db, job_idSelected,id))
-            return;
-        string MinYearsExp;
-        cout << "Enter minimum years of experience you want to see in the candidate resume, or enter 'B' to go back:\n ";
-        getline(cin >> ws,MinYearsExp);
+        if (!printPendingCandidates(db, job_idSelected,id,candidates))
+            flag = false;
+        if (flag) {
+            string MinYearsExp;
 
-        if (MinYearsExp == "B") {
-            break;
-        }
+            cout
+                    << "Enter minimum years of experience you want to see in the candidate resume, or enter 'B' to go back:\n ";
+            getline(cin >> ws, MinYearsExp);
 
-        try {
-            // Select all resumes
-            Statement selectQuery(db, "SELECT * FROM resumes;");
-
-            // Execute the query
-            while (selectQuery.executeStep()) {
-                string candidate_id = selectQuery.getColumn(0).getText(); // Assuming candidate_id is the first column
-                string full_name = selectQuery.getColumn(1).getText(); // Assuming full_name is the second column
-                int age = selectQuery.getColumn(2).getInt(); // Assuming age is the third column
-                string degree1 = selectQuery.getColumn(3).getText(); // Assuming degree1 is the fourth column
-                string degree2 = selectQuery.getColumn(4).getText(); // Assuming degree2 is the fifth column
-                string degree3 = selectQuery.getColumn(5).getText(); // Assuming degree3 is the sixth column
-                string work_experience = selectQuery.getColumn(6).getText(); // Assuming work_experience is the seventh column
-                int years_of_experience = selectQuery.getColumn(7).getInt(); // Assuming years_of_experience is the eighth column
-
-                // Check if the candidate meets the minimum years of experience requirement
-                if (years_of_experience >= stoi(MinYearsExp)) {
-                    // Print the resume data
-                    cout << "Candidate ID: " << candidate_id << endl;
-                    cout << "Full Name: " << full_name << endl;
-                    cout << "Age: " << age << endl;
-                    cout << "Degrees: " << degree1 << " " << degree2 << "  " << degree3 << endl;
-                    cout << "Work Experience: " << work_experience << endl;
-                    cout << "Years of Experience: " << years_of_experience << endl;
-                    cout << "---------------------------------------------" << endl;
-                    ++count;
-                }
+            if (MinYearsExp == "B") {
+                break;
             }
-        } catch (const exception& e) {
-            cerr << "SQLite exception: " << e.what() << endl;
+
+            try {
+                for (int i = 0; i < candidates.size(); ++i) {
+                    string current_candidate_id = candidates[i];
+                    Statement selectQuery(db, "SELECT * FROM resumes WHERE candidate_id = ?");
+                    selectQuery.bind(1,current_candidate_id);
+                    // Execute the query
+                    while (selectQuery.executeStep()) {
+                        string candidate_id = selectQuery.getColumn(
+                                0).getText(); // Assuming candidate_id is the first column
+                        string full_name = selectQuery.getColumn(1).getText(); // Assuming full_name is the second column
+                        int age = selectQuery.getColumn(2).getInt(); // Assuming age is the third column
+                        string degree1 = selectQuery.getColumn(3).getText(); // Assuming degree1 is the fourth column
+                        string degree2 = selectQuery.getColumn(4).getText(); // Assuming degree2 is the fifth column
+                        string degree3 = selectQuery.getColumn(5).getText(); // Assuming degree3 is the sixth column
+                        string work_experience = selectQuery.getColumn(
+                                6).getText(); // Assuming work_experience is the seventh column
+                        int years_of_experience = selectQuery.getColumn(
+                                7).getInt(); // Assuming years_of_experience is the eighth column
+
+                        // Check if the candidate meets the minimum years of experience requirement
+                        if (years_of_experience >= stoi(MinYearsExp)) {
+                            // Print the resume data
+                            cout << "Candidate ID: " << candidate_id << endl;
+                            cout << "Full Name: " << full_name << endl;
+                            cout << "Age: " << age << endl;
+                            cout << "Degrees: " << degree1 << " " << degree2 << "  " << degree3 << endl;
+                            cout << "Work Experience: " << work_experience << endl;
+                            cout << "Years of Experience: " << years_of_experience << endl;
+                            cout << "---------------------------------------------" << endl;
+                            ++count;
+                        }
+                    }
+                }
+
+            } catch (const exception &e) {
+                cerr << "SQLite exception: " << e.what() << endl;
+            }
+            if (count == 0)
+                cout << "no resume found with that given of minimum years of experience.\n";
         }
-        if(count == 0)
-            cout << "no resume found with that given of minimum years of experience.\n";
     }
 }

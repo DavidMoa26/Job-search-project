@@ -14,11 +14,13 @@
 #define WIDTH 45
 #define BORDER_CHAR '|'
 #define FILL_CHAR '-'
-#define BACK "b"
+#define BACK_TO_MENU "b"
+#define BACK_TO_PREVIOUS_DETAIL "p"
 #define CONTINUE "0"
 #define ALL_GOOD "1"
+enum ResumeDetailsMenu{FULL_NAME_DETAIL = 1, AGE_DETAIL, DEGREE1_DETAIL, DEGREE2_DETAIL, DEGREE3_DETAIL, WORK_EXPERIENCE_DETAIL, YEARS_OF_EXPERIENCE_DETAIL, END_OF_RESUME};
 enum DegreesMenu{DOES_NOT_HAVE = '0', BA, MA, PHD};
-enum EditingSearchMenu{CHANGE_NAME = '1', CHANGE_AGE, CHANGE_PASSWORD,CHANGE_FREETEXT,CHANGE_QUESTION, BACK_TO_MENU};
+enum EditingSearchMenu{CHANGE_NAME = '1', CHANGE_AGE, CHANGE_PASSWORD,CHANGE_FREETEXT,CHANGE_QUESTION, BACK_TO_MENU_};
 enum CategoriesSearchMenu{SEARCH_BY_LOCATION = '1', SEARCH_BY_SCOPE, SEARCH_BY_EXPERIENCE_YEARS, SEARCH_BY_PROFESSION, BACK_TO_LOOK_FOR_JOBS_MENU};
 using namespace std;
 
@@ -63,7 +65,8 @@ void ViewAllJobs(Database& db)
     }
     catch(exception & e)
     {
-        cerr << "SQLite exception: " << e.what() << endl;
+        cout << "No jobs found.\n";
+        //cerr << "SQLite exception: " << e.what() << endl;
     }
 }
 string SelectJob(Database& db, string& id, vector<string>& filteredJobs)
@@ -113,7 +116,8 @@ string SelectJob(Database& db, string& id, vector<string>& filteredJobs)
             return "ERROR";
         }
     } catch(exception& e) {
-        cerr << "SQLite exception: " << e.what() << endl;
+        cout << "No jobs found.\n";
+        //cerr << "SQLite exception: " << e.what() << endl;
     }
     return "ERROR";
 }
@@ -151,7 +155,7 @@ char AnswerTheFilter(vector<string>& answerForFilter)
     {
         case SEARCH_BY_LOCATION: {
             string locationChoice;
-            if (EnterTillValid(locationChoice, "location") == BACK)
+            if (EnterTillValid(locationChoice, "location") == BACK_TO_MENU)
                 return BACK_TO_LOOK_FOR_JOBS_MENU;
             answerForFilter.push_back(locationChoice);
             return SEARCH_BY_LOCATION;
@@ -169,10 +173,10 @@ char AnswerTheFilter(vector<string>& answerForFilter)
                     cout << "The min of years can't be bigger than the max of year!" << endl;
                 firstIter = false;
                 cout << "Please enter the min of experience years (0 - 50)   |   Back - 'b':\n";
-                if (EnterYearsOfExperienceTillValid(minYearsOfExperience) == BACK)
+                if (EnterYearsOfExperienceTillValid(minYearsOfExperience) == BACK_TO_MENU)
                     return BACK_TO_LOOK_FOR_JOBS_MENU;
                 cout << "Please enter the max of experience years (0 - 50)   |   Back - 'b':\n";
-                if (EnterYearsOfExperienceTillValid(maxYearsOfExperience) == BACK)
+                if (EnterYearsOfExperienceTillValid(maxYearsOfExperience) == BACK_TO_MENU)
                     return BACK_TO_LOOK_FOR_JOBS_MENU;
             } while (minYearsOfExperience > maxYearsOfExperience);
             answerForFilter.push_back(minYearsOfExperience);
@@ -181,7 +185,7 @@ char AnswerTheFilter(vector<string>& answerForFilter)
         }
         case SEARCH_BY_PROFESSION: {
             string professionChoice;
-            if (EnterTillValid(professionChoice, "profession") == BACK)
+            if (EnterTillValid(professionChoice, "profession") == BACK_TO_MENU)
                 return BACK_TO_LOOK_FOR_JOBS_MENU;
             answerForFilter.push_back(professionChoice);
             return SEARCH_BY_PROFESSION;
@@ -252,7 +256,8 @@ string SearchByCategory(Database& db, vector<string>& filteredJobs)
     }
     catch(exception & e)
     {
-        cerr << "SQLite exception: " << e.what() << endl;
+        cout << "No jobs found.\n";
+        //cerr << "SQLite exception: " << e.what() << endl;
     }
     return "ALL_GOOD";
 }
@@ -298,19 +303,26 @@ bool strIsValid(string &str, const string& strMessage) {
     if(str.length() == 0 || str.length() >= 50 ||   !CheckIfOnlyLettersOrSpace(str))
     {
         cout << "You entered an invalid " << strMessage << "(Must contain only letters and not exceed 50 characters).\n"
-             << "Please try again   |   Back - 'b'.\n";
+             << "Please try again.\n"
+                "Or back to the previous detail - press 'p'.\n"
+                "Or back to menu - 'b'.\n";
         return false;
     }
     return true;
 }
 string EnterTillValid(string& str, const string& strMessage)
 {
-    cout << "Please enter your " << strMessage << " (must contain only letters and not more than 50 letters)   |   Back - 'b':\n";
+        cout << "Please enter your " << strMessage << " (must contain only letters and not more than 50 letters).\n"
+                "Or back to the previous detail - press 'p'.\n"
+                "Or back to menu - 'b'.\n";
+
     do {
         fflush(stdin);
         getline(cin, str);
-        if (str == BACK)
-            return BACK;
+        if (str == BACK_TO_MENU)
+            return BACK_TO_MENU;
+        if (str == BACK_TO_PREVIOUS_DETAIL)
+            return BACK_TO_PREVIOUS_DETAIL;
     } while (!strIsValid(str, strMessage));
     return ALL_GOOD;
 }
@@ -318,25 +330,33 @@ bool validateYearsOfExperience(string & years_of_experience)
 {
     if(!CheckIfIdIsDigits(years_of_experience))
     {
-        cout << "You entered an invalid years of experience(Must be between 0 - 50) Please try again.\n";
+        cout << "You entered an invalid years of experience(Must be between 0 - 50) Please try again.\n"
+                "Or back to the previous detail - press 'p'.\n"
+                "Or back to menu - 'b'.\n";
         return false;
     }
     int ageNumber = stoi(years_of_experience);
     if(ageNumber < 0 || ageNumber > 50 || !NotValidSpace(years_of_experience))
     {
-        cout << "You entered an invalid years of experience(Must be between 0 - 50) Please try again.\n";
+        cout << "You entered an invalid years of experience(Must be between 0 - 50) Please try again."
+                "Or back to the previous detail - press 'p'.\n"
+                "Or back to menu - 'b'.\n";
         return false;
     }
     return true;
 }
 string EnterYearsOfExperienceTillValid(string& years_of_experience)
 {
-    cout << "Please enter your years of experience(Must be between 0 - 50)   |   Back - 'b'.\n";
+    cout << "Please enter your years of experience(Must be between 0 - 50)."
+            "Or back to the previous detail - press 'p'.\n"
+            "Or back to menu - 'b'.\n";
     do {
         fflush(stdin);
         getline(cin, years_of_experience);
-        if (years_of_experience == BACK)
-            return BACK;
+        if (years_of_experience == BACK_TO_MENU)
+            return BACK_TO_MENU;
+        if (years_of_experience == BACK_TO_PREVIOUS_DETAIL)
+            return BACK_TO_PREVIOUS_DETAIL;
     } while (!validateYearsOfExperience(years_of_experience));
     return ALL_GOOD;
 }
@@ -355,33 +375,126 @@ void CreateResume(Database& db, string& id)
         firstIter = false;
         fflush(stdin);
         getline(cin, choice);
-        if (choice == BACK)
+        if (choice == BACK_TO_MENU)
             return;
     } while (choice!="r");
+
     string full_name, age, degree1, degree2, degree3, work_experience, years_of_experience;
-    //FullName
-    if(EnterTillValid(full_name, "full name") == BACK)
-        return;
-    //Age
-    if (EnterAgeTillValid(age) == BACK)
-        return;
-    //Degrees
-    int degreesNumber = SelectDegree();
-    if (degreesNumber >= 1 && degreesNumber <= 3)
-        if(EnterTillValid(full_name, "Bachelor's degree (B.A.)") == BACK)
-            return;
-    if (degreesNumber >= 2 && degreesNumber <= 3)
-        if(EnterTillValid(full_name, "Master's degree (M.A.)") == BACK)
-            return;
-    if (degreesNumber == 3)
-        if(EnterTillValid(full_name, "Ph.D degree") == BACK)
-            return;
-    //WorkExperience
-    if (EnterFreeTextTillValid(work_experience) == BACK)
-        return;
-    //YearsOfExperience
-    if(EnterYearsOfExperienceTillValid(years_of_experience) == BACK)
-        return;
+    int detailNum = 1;
+    string detailStatus;
+    while (detailNum != END_OF_RESUME)
+    {
+        //FullName
+        if (detailNum == FULL_NAME_DETAIL)
+        {
+            detailStatus = EnterTillValid(full_name, "full name");
+            if (detailStatus == BACK_TO_MENU || detailStatus == BACK_TO_PREVIOUS_DETAIL)
+                return;
+            else
+                detailNum = AGE_DETAIL;
+        }
+        //Age
+        if (detailNum == AGE_DETAIL)
+        {
+            detailStatus = EnterAgeTillValid(age);
+            if (detailStatus == BACK_TO_MENU)
+                return;
+            else if (detailStatus == BACK_TO_PREVIOUS_DETAIL)
+            {
+                age = "";
+                detailNum = FULL_NAME_DETAIL;
+            }
+            else
+                detailNum = DEGREE1_DETAIL;
+        }
+
+        //Degrees
+        int degreesNumber;
+        if (detailNum == DEGREE1_DETAIL) {
+            degreesNumber = SelectDegree();
+            if (degreesNumber == 0)
+                detailNum = WORK_EXPERIENCE_DETAIL;
+            if (degreesNumber >= 1 && degreesNumber <= 3)
+            {
+                detailStatus = EnterTillValid(full_name, "Bachelor's degree (B.A.)");
+                if (detailStatus == BACK_TO_MENU)
+                    return;
+                else if (detailStatus == BACK_TO_PREVIOUS_DETAIL)
+                {
+                    degree1 = "";
+                    detailNum = AGE_DETAIL;
+                }
+                else {
+                    if (degreesNumber == 1)detailNum = WORK_EXPERIENCE_DETAIL;
+                    if (degreesNumber == 2 || degreesNumber == 3)detailNum = DEGREE2_DETAIL;
+                    }
+            }
+        }
+        if (detailNum == DEGREE2_DETAIL)
+        {
+            if (degreesNumber >= 2 && degreesNumber <= 3)
+            {
+                detailStatus = EnterTillValid(full_name, "Master's degree (M.A.)");
+                if (detailStatus == BACK_TO_MENU)
+                    return;
+                else if (detailStatus == BACK_TO_PREVIOUS_DETAIL)
+                {
+                    degree2 = "";
+                    detailNum = DEGREE1_DETAIL;
+                }
+                else {
+                    if (degreesNumber == 2)detailNum = WORK_EXPERIENCE_DETAIL;
+                    if (degreesNumber == 3)detailNum = DEGREE3_DETAIL;
+                }
+            }
+        }
+        if (detailNum == DEGREE3_DETAIL)
+        {
+            if (degreesNumber == 3)
+            {
+                detailStatus = EnterTillValid(full_name, "Ph.D degree");
+                if (detailStatus == BACK_TO_MENU)
+                    return;
+                if (detailStatus == BACK_TO_PREVIOUS_DETAIL)
+                {
+                    degree3 = "";
+                    detailNum = DEGREE2_DETAIL;
+                }
+                else
+                    detailNum = WORK_EXPERIENCE_DETAIL;
+            }
+        }
+        if (detailNum == WORK_EXPERIENCE_DETAIL)
+        {//WorkExperience
+            detailStatus = EnterFreeTextTillValid(work_experience);
+            if (detailStatus == BACK_TO_MENU)
+                return;
+            else if (detailStatus == BACK_TO_PREVIOUS_DETAIL)
+            {
+                work_experience = "";
+                if (degreesNumber == 0)detailNum = AGE_DETAIL;
+                if (degreesNumber == 1)detailNum = DEGREE1_DETAIL;
+                if (degreesNumber == 2)detailNum = DEGREE2_DETAIL;
+                if (degreesNumber == 3)detailNum = DEGREE3_DETAIL;
+            }
+            else
+                detailNum = YEARS_OF_EXPERIENCE_DETAIL;
+        }
+        if (detailNum == YEARS_OF_EXPERIENCE_DETAIL)
+        {//YearsOfExperience
+            detailStatus = EnterYearsOfExperienceTillValid(years_of_experience);
+            if (detailStatus == BACK_TO_MENU)
+                return;
+            else if (detailStatus == BACK_TO_PREVIOUS_DETAIL)
+            {
+                years_of_experience = "";
+                detailNum = WORK_EXPERIENCE_DETAIL;
+            }
+            else
+                detailNum = END_OF_RESUME;
+        }
+
+    }
 
     string confirm;
     do {
@@ -451,7 +564,7 @@ void ViewAllSubmittedJobs(Database& db, string& candidate_id)
         bool flagIfAnyJobWasPrinted = false;
         while (query1.executeStep())
         {
-            string submittedJobId = query1.getColumn(0).getText();
+            string submittedJobId = query1.getColumn(1).getText();
             Statement query2(db, "SELECT * FROM jobs_list");
             while (query2.executeStep())
             {
@@ -473,7 +586,8 @@ void ViewAllSubmittedJobs(Database& db, string& candidate_id)
     }
     catch(exception & e)
     {
-        cerr << "SQLite exception: " << e.what() << endl;
+        cout << "No jobs found.\n";
+        //cerr << "SQLite exception: " << e.what() << endl;
     }
 }
 
@@ -487,7 +601,8 @@ void editName(Database& db,  string& id)
         db.exec("UPDATE users SET name = '" + newName + "' WHERE id = '" + id + "'");
         cout << "Name updated successfully.\n";
     } catch (exception& e) {
-        cerr << "SQLite exception: " << e.what() << endl;
+        cout << "Id not found!\n";
+        //cerr << "SQLite exception: " << e.what() << endl;
     }
 }
 void editAge(Database& db,  string& id) {
@@ -498,7 +613,8 @@ void editAge(Database& db,  string& id) {
         db.exec("UPDATE users SET age = " + newAge + " WHERE id = '" + id + "'");
         cout << "Age updated successfully.\n";
     } catch (exception& e) {
-        cerr << "SQLite exception: " << e.what() << endl;
+        cout << "Id not found!\n";
+        //cerr << "SQLite exception: " << e.what() << endl;
     }
 }
 void editPassword(Database& db,  string& id)
@@ -510,7 +626,8 @@ void editPassword(Database& db,  string& id)
         db.exec("UPDATE users SET password = '" + newPassword + "' WHERE id = '" + id + "'");
         cout << "Password updated successfully.\n";
     } catch (exception& e) {
-        cerr << "SQLite exception: " << e.what() << endl;
+        cout << "Id not found!\n";
+        //cerr << "SQLite exception: " << e.what() << endl;
     }
 }
 void editFreeText(Database& db,  string& id) {
@@ -522,7 +639,8 @@ void editFreeText(Database& db,  string& id) {
         db.exec("UPDATE users SET freetext = '" + newFreetext + "' WHERE id = '" + id + "'");
         cout << "Free text updated successfully.\n";
     } catch (exception& e) {
-        cerr << "SQLite exception: " << e.what() << endl;
+        cout << "Id not found!\n";
+        //cerr << "SQLite exception: " << e.what() << endl;
     }
 }
 void editQuestion(Database& db,  string& id)
@@ -535,7 +653,8 @@ void editQuestion(Database& db,  string& id)
         db.exec(query);
         cout << "Question and answer updated successfully.\n";
     } catch (exception& e) {
-        cerr << "SQLite exception: " << e.what() << endl;
+        cout << "Id not found!\n";
+        //cerr << "SQLite exception: " << e.what() << endl;
     }
 }
 void editProfile(Database& db, string& id) {
@@ -567,7 +686,7 @@ void editProfile(Database& db, string& id) {
             case CHANGE_QUESTION:
                 editQuestion(db, id);
                 break;
-            case BACK_TO_MENU:
+            case BACK_TO_MENU_:
                 return;
             default:
                 cout << "Invalid option. Please try again.\n";
@@ -579,7 +698,9 @@ void RejectAcceptInterviewInvitation(Database&db,string&id)
 {
     while (true)
     {
-        try {
+        bool flag = true;
+        try
+        {
             // Select data from submission table where status is accepted and candidate_id matches the provided id
             Statement selectQuery(db, "SELECT job_id FROM submission WHERE status = 'accepted' AND candidate_id = ?;");
 
@@ -587,54 +708,98 @@ void RejectAcceptInterviewInvitation(Database&db,string&id)
             selectQuery.bind(1, id);
 
             // Execute the query
-            while (selectQuery.executeStep()) {
-                string job_id = selectQuery.getColumn(0).getText();
-                cout << "You have an interview invitation for job id:" << job_id << endl;
+            bool foundInvitation = false;
+            while (selectQuery.executeStep())
+            {
+                string job_id = selectQuery.getColumn(0).getText(); // Column index starts from 0
+                cout << "You have an interview invitation for job id: " << job_id << endl;
+                foundInvitation = true;
             }
-        } catch (const exception &e) {
+
+            // If no invitation is found, return from the function
+            if (!foundInvitation) {
+                cout << "You dont have interview invitation\n";
+                return;
+            }
+        } catch (const exception &e)
+        {
             cerr << "SQLite exception: " << e.what() << endl;
         }
+        Statement selectQuery(db, "SELECT job_id FROM submission WHERE status = 'accepted' AND candidate_id = ? AND job_id = ?;");
         string job_id;
         cout << "select a job id you want to accept/reject the invitation   |    Back - 'b'.\n";
-        do{
-            getline(cin >> ws, job_id);
-            if (job_id == BACK)
-                return;
-        } while(!CheckIfIdIsDigits(job_id));
-        char choice;
-        cout << "1. Accept" << endl;
-        cout << "2. Reject" << endl;
-        cout << "3. Go Back" << endl;
-        choice = UserChoice();
-        string status;
-        bool flagToContinue = true;
-        while (flagToContinue) {
-            switch (choice) {
-                case '1':
-                    status = "accept";
-                    flagToContinue = false;
-                    break;
-                case '2':
-                    status = "rejected";
-                    flagToContinue = false;
-                    break;
-                case '3':
-                    return;
-                default:
-                    cout << "Invalid choice. Please enter '1' or '2' or '3'." << endl;
+        do
+        {
+
+            fflush(stdin);
+            getline(cin , job_id);
+            selectQuery.bind(1, id);
+            selectQuery.bind(2, job_id);
+
+            // Execute the query
+            bool foundInvitation = false;
+            while (selectQuery.executeStep())
+            {
+                foundInvitation = true;
             }
+            if (!foundInvitation)
+            {
+                cout << "Invalid job ID. Please select from the provided invitations.\n";
+                flag = false;
+
+            }
+            if (job_id == BACK_TO_MENU)
+                return;
         }
-
-        try
+        while(!CheckIfIdIsDigits(job_id));
+        if(flag)
         {
-            // Update submission status based on choice
-            db.exec("UPDATE submission SET status = '" + status + "' WHERE job_id = '" + job_id + "' AND candidate_id = '" + id + "'");
+            int count = 0;
+            while (true)
+            {
+                char choice;
+                cout << "1. Accept" << endl;
+                cout << "2. Reject" << endl;
+                cout << "3. Go Back" << endl;
+                choice = UserChoice();
+                string status;
+                bool flagToContinue = true;
+                while (flagToContinue) {
+                    switch (choice) {
+                        case '1':
+                            status = "accept";
+                            flagToContinue = false;
+                            break;
+                        case '2':
+                            status = "rejected";
+                            flagToContinue = false;
+                            break;
+                        case '3':
+                        {
+                            count = 1;
+                            flagToContinue = false;
+                            break;
+                        }
+                        default:
+                            cout << "Invalid choice" << endl;
+                            break;
+                    }
+                }
 
-            cout << "Invitation " << status << endl;
+                if(count == 1)
+                    break;
+                try {
+                    // Update submission status based on choice
+                    db.exec("UPDATE submission SET status = '" + status + "' WHERE job_id = '" + job_id +
+                            "' AND candidate_id = '" + id + "'");
 
-        } catch(exception& e)
-        {
-            cerr << "SQLite exception: " << e.what() << endl;
+                    cout << "Invitation " << status << endl;
+
+                } catch (exception &e)
+                {
+                    cerr << "SQLite exception: " << e.what() << endl;
+                }
+            }
         }
     }
 }
@@ -663,13 +828,19 @@ void ViewAllInterviewQuestions(Database& db, string& candidate_id) {
                  << " ===================================== \n \n";
         }
         if (!flag_query1) {
-            cout << "No interview questions.\n";
+            cout << "No tests.\n";
             return;
         }
-
         cout << "Enter number of question you want answer : \n";
-        fflush(stdin);
-        getline(cin, question_choice);
+        bool firstIter = true;
+        do {
+            if (!firstIter)
+                cout << "You entered an illegal choice, please try again:" << endl;
+            firstIter = false;
+            fflush(stdin);
+            getline(cin, question_choice);
+        } while (question_choice < "1" || question_choice > "4");
+
         try {
             Statement query2(db,"SELECT id,correct_answer FROM tests WHERE id = ?");
             query2.bind(1, stoi(question_choice));
@@ -677,8 +848,14 @@ void ViewAllInterviewQuestions(Database& db, string& candidate_id) {
                 flag_query2 = true;
                 string storedCorrectAnswer = query2.getColumn(1).getText();
                 cout << "Enter the answer 1-4 : \n";
-                fflush(stdin);
-                getline(cin, answer_choice);
+                bool firstIter2 = true;
+                do {
+                    if (!firstIter2)
+                        cout << "You entered an illegal choice, please try again:" << endl;
+                    firstIter2 = false;
+                    fflush(stdin);
+                    getline(cin, answer_choice);
+                } while (answer_choice < "1" || answer_choice > "4");
                 if(storedCorrectAnswer == answer_choice) {
                     int grade = 100;
                     Statement query3(db,"UPDATE tests SET grade = ? WHERE id = ?");
@@ -706,6 +883,7 @@ void ViewAllInterviewQuestions(Database& db, string& candidate_id) {
     }
     catch(exception & e)
     {
-        cerr << "SQLite exception: " << e.what() << endl;
+        cout << "No tests.\n";
+        //cerr << "SQLite exception: " << e.what() << endl;
     }
 }

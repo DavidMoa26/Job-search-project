@@ -253,38 +253,48 @@ string EnterFreeTextTillValid(string& freeText)
 //***************************************************
 string selectQuestion(string &question, string &answer)
 {
-    cout << "Please select a number of question:\n";
-    cout << "1. What is the name of your father?\n"
-         << "2. What is the name of your mother?\n"
-         << "3. What is the name of the school you attended?\n"
-         << "4. What year were you born?\n"
-         << "5. What is your favorite food?\n"
-         << "6. Back to the previous detail.\n"
-         << "7. Back to menu.\n";
-    char option;
-    option = UserChoice();
-    switch (option) {
-        case QUESTION_1:
-            question = "What is the name of your father?";
-            break;
-        case QUESTION_2:
-            question = "What is the name of your mother?";
-            break;
-        case QUESTION_3:
-            question = "What is the name of the school you attended?";
-            break;
-        case QUESTION_4:
-            question = "What year were you born?";
-            break;
-        case QUESTION_5:
-            question = "What is your favorite food?";
-            break;
-        case GO_BACK_TO_PREVIOUS_DETAIL:
-            return BACK_TO_PREVIOUS_DETAIL;
-        case GO_BACK_TO_MENU:
-            return BACK_TO_MENU;
-        default:
-            cout << "You entered an illegal option. Please try again!\n";
+    bool flagToContinue = true;
+    while (flagToContinue)
+    {
+        cout << "Please select a number of question:\n";
+        cout << "1. What is the name of your father?\n"
+             << "2. What is the name of your mother?\n"
+             << "3. What is the name of the school you attended?\n"
+             << "4. What year were you born?\n"
+             << "5. What is your favorite food?\n"
+             << "6. Back to the previous detail.\n"
+             << "7. Back to menu.\n";
+        char option;
+        option = UserChoice();
+        switch (option)
+        {
+            case QUESTION_1:
+                question = "What is the name of your father?";
+                flagToContinue = false;
+                break;
+            case QUESTION_2:
+                question = "What is the name of your mother?";
+                flagToContinue = false;
+                break;
+            case QUESTION_3:
+                question = "What is the name of the school you attended?";
+                flagToContinue = false;
+                break;
+            case QUESTION_4:
+                question = "What year were you born?";
+                flagToContinue = false;
+                break;
+            case QUESTION_5:
+                question = "What is your favorite food?";
+                flagToContinue = false;
+                break;
+            case GO_BACK_TO_PREVIOUS_DETAIL:
+                return BACK_TO_PREVIOUS_DETAIL;
+            case GO_BACK_TO_MENU:
+                return BACK_TO_MENU;
+            default:
+                cout << "You entered an illegal option. Please try again!\n";
+        }
     }
     cout << "Please enter your answer for \"" << question << "\":\n";
     fflush(stdin);
@@ -327,24 +337,25 @@ string SelectCandidateOrEmployer(string& role){
 
 //ForgotPassword
 //***************************************************
-bool CheckUserAnswer(Database& db, string& id) {
+bool CheckUserAnswer(Database& db, string& id, string& question, string& answer) {
     if (!ForgotPasswordTableExists(db)) {
         cout << "forgot_password table does not exist.\n";
         return false;
     }
     try {
-        string answer;
         Statement query(db, "SELECT question,answer FROM forgot_password WHERE id = ?");
         query.bind(1, stoi(id));
         if (query.executeStep()) {
-            string dbQuestion = query.getColumn(0).getText();
+            question = query.getColumn(0).getText();
             string dbAnswer = query.getColumn(1).getText();
-            cout << "For change your password answer the next question:\n";
-            //printf()
-            cout << dbQuestion << "\n";
+            int currentDetail = QUESTION_DETAIL;
+            string newPassword = "";
+            printForgotPasswordSection(currentDetail, id, question, answer, newPassword);
+            cout << "For change your password answer the question:\n";
             fflush(stdin);
             getline(cin, answer);
             if (dbAnswer == answer) {
+                printForgotPasswordSection(currentDetail, id, question, answer, newPassword);
                 cout << "Correct answer.\n";
                 return true;
             } else {
@@ -360,8 +371,9 @@ bool CheckUserAnswer(Database& db, string& id) {
         return false;
     }
 }
-void ChangePassword (Database& db, string& id) {
+void ChangePassword (Database& db, string& id, string& question, string& answer) {
     string newPassword;
+    printForgotPasswordSection(PASSWORD_DETAIL, id, question, answer, newPassword);
     if (EnterPasswordTillValid(newPassword) == BACK_TO_MENU)
         return;
     try {
@@ -369,6 +381,7 @@ void ChangePassword (Database& db, string& id) {
         query.bind(1, newPassword);
         query.bind(2, stoi(id));
         query.exec();
+        printForgotPasswordSection(PASSWORD_DETAIL, id, question, answer, newPassword);
         cout << "Password updated successfully.\n";
     } catch(exception &e) {
         cerr << "SQLite exception: " << e.what() << "\n";
@@ -376,10 +389,10 @@ void ChangePassword (Database& db, string& id) {
 }
 void ForgotPassword(Database& db)
 {
-    cout << "Enter Your ID (must be 9 digits)   |   Back - 'b':\n";
     string id="",question="",answer="",newPassword="";
     int currentDetail = 1;
     printForgotPasswordSection(currentDetail, id, question, answer, newPassword);
+    cout << "Enter Your ID (must be 9 digits)   |   Back - 'b':\n";
     do {
         fflush(stdin);
         getline(cin, id);
@@ -387,8 +400,8 @@ void ForgotPassword(Database& db)
             return;
         printForgotPasswordSection(currentDetail, id, question, answer, newPassword);
     } while (!validateId(id));
-    if(CheckUserAnswer(db,id))
-        ChangePassword(db,id);
+    if(CheckUserAnswer(db,id, question, answer))
+        ChangePassword(db,id,question,answer);
 }
 //***************************************************
 
@@ -406,9 +419,9 @@ void Register (Database& db)
     string detailStatus;
     while (detailNum != END_OF_REGISTER)
     {
-        printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
         if (detailNum == ID_DETAIL)
         {
+            printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
             id = "";
             detailStatus = EnterIdTillValid(id);
             if (detailStatus == BACK_TO_MENU)
@@ -416,9 +429,9 @@ void Register (Database& db)
             else
                 detailNum = PASSWORD_DETAIL;
         }
-        printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
         if (detailNum == PASSWORD_DETAIL)
         {
+            printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
             detailStatus = EnterPasswordTillValid(password);
             if (detailStatus == BACK_TO_MENU)
                 return;
@@ -429,9 +442,9 @@ void Register (Database& db)
             }            else
                 detailNum = NAME_DETAIL;
         }
-        printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
         if (detailNum == NAME_DETAIL)
         {
+            printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
             detailStatus = EnterNameTillValid(name);
             if (detailStatus == BACK_TO_MENU)
                 return;
@@ -442,9 +455,9 @@ void Register (Database& db)
             }            else
                 detailNum = AGE_DETAIL;
         }
-        printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
         if (detailNum == AGE_DETAIL)
         {
+            printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
             detailStatus = EnterAgeTillValid(age);
             if (detailStatus == BACK_TO_MENU)
                 return;
@@ -455,9 +468,9 @@ void Register (Database& db)
             }            else
                 detailNum = FREE_TEXT_DETAIL;
         }
-        printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
         if (detailNum == FREE_TEXT_DETAIL)
         {
+            printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
             detailStatus = EnterFreeTextTillValid(freeText);
             if (detailStatus == BACK_TO_MENU)
                 return;
@@ -468,9 +481,9 @@ void Register (Database& db)
             }            else
                 detailNum = QUESTION_DETAIL;
         }
-        printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
         if (detailNum == QUESTION_DETAIL)
         {
+            printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
             detailStatus = selectQuestion(question,answer);
             if (detailStatus == BACK_TO_MENU)
                 return;
@@ -482,9 +495,9 @@ void Register (Database& db)
             }            else
                 detailNum = ROLE_DETAIL;
         }
-        printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
         if (detailNum == ROLE_DETAIL)
         {
+            printRegisterSection(detailNum, id, password, name, age, question, answer, freeText, role);
             detailStatus = SelectCandidateOrEmployer(role);
             if (detailStatus == BACK_TO_MENU)
                 return;
@@ -666,22 +679,22 @@ void printForgotPasswordSection(int currentDetail, string& id, string& question,
              << "|                                                                               |\n"
              << "|                                                                               |\n"
              << "|                        --------------------------------------------------     |\n"
-             << "|";if (currentDetail == ID_DETAIL) cout << "--->>> ";else cout <<"       ";  cout << "Id        -  |" << left << setw(50) << id << "|    |\n"
+             << "|";if (currentDetail == ID_DETAIL) cout << "--->>> ";else cout <<"       ";  cout << "Id            - |" << left << setw(50) << id << "|    |\n"
              << "|                        --------------------------------------------------     |\n"
              << "|                                                                               |\n"
              << "|                                                                               |\n"
              << "|                        --------------------------------------------------     |\n"
-             << "|";if (currentDetail == PASSWORD_DETAIL) cout << "--->>> ";else cout <<"       ";cout  << "Question  -  |" << left << setw(50) << question << "|    |\n"
+             << "|";if (currentDetail == QUESTION_DETAIL) cout << "--->>> ";else cout <<"       ";cout  << "Question      - |" << left << setw(50) << question << "|    |\n"
              << "|                        --------------------------------------------------     |\n"
              << "|                                                                               |\n"
              << "|                                                                               |\n"
              << "|                        --------------------------------------------------     |\n"
-             << "|";if (currentDetail == PASSWORD_DETAIL) cout << "--->>> ";else cout <<"       ";cout  << "Answer  -  |" << left << setw(50) << answer << "|    |\n"
+             << "|";if (currentDetail == QUESTION_DETAIL) cout << "--->>> ";else cout <<"       ";cout  << "Answer        - |" << left << setw(50) << answer << "|    |\n"
              << "|                        --------------------------------------------------     |\n"
              << "|                                                                               |\n"
              << "|                                                                               |\n"
              << "|                        --------------------------------------------------     |\n"
-             << "|";if (currentDetail == PASSWORD_DETAIL) cout << "--->>> ";else cout <<"       ";cout  << "New password  -  |" << left << setw(50) << newPassword << "|    |\n"
+             << "|";if (currentDetail == PASSWORD_DETAIL) cout << "--->>> ";else cout <<"       ";cout  << "New password  - |" << left << setw(50) << newPassword << "|    |\n"
              << "|                        --------------------------------------------------     |\n"
              << "|                                                                               |\n"
              << "|                                                                               |\n"

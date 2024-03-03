@@ -199,12 +199,12 @@ void CreateResumeTable(Database& db)
     try {
         db.exec("CREATE TABLE IF NOT EXISTS resumes ("
                 "candidate_id INTEGER PRIMARY KEY UNIQUE,"
-                "full_name NOT NULL,"
+                "full_name TEXT NOT NULL,"
                 "age INTEGER NOT NULL,"
-                "degree1,"
-                "degree2,"
-                "degree3,"
-                "work_experience NOT NULL,"
+                "degree1 TEXT,"
+                "degree2 TEXT,"
+                "degree3 TEXT,"
+                "work_experience TEXT NOT NULL,"
                 "years_of_experience INTEGER NOT NULL);");
         cout << "resumes table created.\n";
     } catch (const exception& e) {
@@ -357,6 +357,19 @@ void InsertSubmitToTable(Database& db, string& candidate_id, string& jobId)
         query1.bind(1, stoi(jobId));
         Statement query2(db, "SELECT * FROM resumes WHERE candidate_id = ?");
         query2.bind(1, stoi(candidate_id));
+        Statement queryIfThereIsSubmission(db, "SELECT job_id, candidate_id FROM submission WHERE (job_id, candidate_id) = (?,?);");
+        queryIfThereIsSubmission.bind(1, stoi(jobId));
+        queryIfThereIsSubmission.bind(2, stoi(candidate_id));
+        while (queryIfThereIsSubmission.executeStep())
+        {
+            string dbJobId = queryIfThereIsSubmission.getColumn(0).getText();
+            string dbCandidate = queryIfThereIsSubmission.getColumn(1).getText();
+            if (dbJobId == jobId && dbCandidate == candidate_id)
+            {
+                cout << "You already entered your resume for this job, go find other jobs." << endl;
+                return;
+            }
+        }
         if (query2.executeStep())
         {
             if (query1.executeStep())
@@ -384,8 +397,6 @@ void InsertSubmitToTable(Database& db, string& candidate_id, string& jobId)
         cerr << "SQLite exception: " << e.what() << endl;
     }
 }
-
-
 void CreatTables(Database& db)
 {
     if(!InterviewInvitationsExist(db))

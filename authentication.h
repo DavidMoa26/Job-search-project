@@ -45,8 +45,8 @@ string SelectCandidateOrEmployer(string& role);
 
 //ForgotPassword
 //***************************************************
-bool CheckUserAnswer(Database&, string&);
-void ChangePassword(Database& , string&);
+bool CheckUserAnswer(Database&, string&, string&, string&);
+void ChangePassword(Database& , string&, string&, string&);
 void ForgotPassword(Database&);
 //***************************************************
 
