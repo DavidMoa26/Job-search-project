@@ -81,11 +81,17 @@ string SelectJob(Database& db, string& id, vector<string>& filteredJobs)
     try {
         if (!filteredJobs.empty())
         {
-            for (string &job: filteredJobs)
+            bool thereIsAJob = false;
+            for (string job: filteredJobs)
                 if (jobIdChoice == job)
+                {
+                    thereIsAJob = true;
                     break;
-            cout << "No jobs found.\n";
-            return "ERROR";
+                }
+            if (!thereIsAJob) {
+                cout << "No jobs found.\n";
+                return "ERROR";
+            }
         }
         Statement query(db, "SELECT * FROM jobs_list WHERE id = ?");
         query.bind(1, stoi(jobIdChoice));
@@ -305,9 +311,10 @@ bool strIsValid(string &str, const string& strMessage) {
 }
 string EnterTillValid(string& str, const string& strMessage)
 {
-        cout << "Please enter your " << strMessage << " (must contain only letters and not more than 50 letters).\n"
-                "Or back to the previous detail - press 'p'.\n"
-                "Or back to menu - 'b'.\n";
+        cout << "Please enter your " << strMessage << " (must contain only letters and not more than 50 letters).\n";
+        if (strMessage != "location" && strMessage != "profession")
+            cout << "Or back to the previous detail - press 'p'.\n";
+        cout << "Or back to menu - 'b'.\n";
 
     do {
         fflush(stdin);

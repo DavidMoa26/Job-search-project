@@ -66,6 +66,7 @@ void CandidateMenu(Database& db , string& id, string& name) {
                 break;
             case VIEW_QUESTIONS:
                 ViewAllInterviewQuestions(db,id);
+                break;
             case LOG_OUT_C:
                 return;
             default:
@@ -221,7 +222,6 @@ void LookForJobsMenu(Database& db, string& id)
              << " ---------------------------------------------------- \n";
         cout << "Please enter your choice: " << endl;
 
-        ChangeColor(7,0);
         option = UserChoice();
         vector<string> filteredJobs;
         switch (option)
