@@ -25,13 +25,6 @@ enum CategoriesSearchMenu{SEARCH_BY_LOCATION = '1', SEARCH_BY_SCOPE, SEARCH_BY_E
 using namespace std;
 
 // Designing
-void ChangeColor(int textColor,int backgroundColor)
-{
-    HANDLE console_color;//Declaring the variable console_color from HANDLE type.
-    console_color = GetStdHandle(STD_OUTPUT_HANDLE);//Using a function from the library windows.h that allows access to perform operations on the output.
-    SetConsoleTextAttribute(console_color, (textColor + (backgroundColor * 16)));
-//Using a function from the library windows.h which changes the output below it.
-}
 void printLine(int width, char borderChar, char fillChar) {
     cout << setfill(borderChar) << setw(width) << borderChar << endl;
 }
@@ -347,9 +340,7 @@ bool validateYearsOfExperience(string & years_of_experience)
 }
 string EnterYearsOfExperienceTillValid(string& years_of_experience)
 {
-    cout << "Please enter your years of experience(Must be between 0 - 50)."
-            "Or back to the previous detail - press 'p'.\n"
-            "Or back to menu - 'b'.\n";
+
     do {
         fflush(stdin);
         getline(cin, years_of_experience);
@@ -482,6 +473,9 @@ void CreateResume(Database& db, string& id)
         }
         if (detailNum == YEARS_OF_EXPERIENCE_DETAIL)
         {//YearsOfExperience
+            cout << "Please enter your years of experience(Must be between 0 - 50)."
+                    "Or back to the previous detail - press 'p'.\n"
+                    "Or back to menu - 'b'.\n";
             detailStatus = EnterYearsOfExperienceTillValid(years_of_experience);
             if (detailStatus == BACK_TO_MENU)
                 return;
