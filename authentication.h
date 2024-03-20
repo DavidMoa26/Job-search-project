@@ -45,8 +45,8 @@ string SelectCandidateOrEmployer(string& role);
 
 //ForgotPassword
 //***************************************************
-bool CheckUserAnswer(Database&, string&);
-void ChangePassword(Database& , string&);
+bool CheckUserAnswer(Database&, string&, string&, string&);
+void ChangePassword(Database& , string&, string&, string&);
 void ForgotPassword(Database&);
 //***************************************************
 
@@ -57,7 +57,9 @@ string Login(Database& db, string& name);
 //***************************************************
 string GetUserRole(Database&,string&);
 
-
+void printRegisterSection(int currentDetail,string& id, string& password, string& name, string& age, string& question, string& answer, string&freetext, string& role);
+void printLoginSection(int currentDetail, string& id, string& password);
+void printForgotPasswordSection(int currentDetail, string& id, string& question, string& answer, string& newPassword);
 
 
 #endif //MAIN_CPP_AUTHENTICATION_H

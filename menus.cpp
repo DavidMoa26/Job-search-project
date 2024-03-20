@@ -66,6 +66,7 @@ void CandidateMenu(Database& db , string& id, string& name) {
                 break;
             case VIEW_QUESTIONS:
                 ViewAllInterviewQuestions(db,id);
+                break;
             case LOG_OUT_C:
                 return;
             default:
@@ -150,7 +151,7 @@ void MainMenu(Database& db)
     while (true)
     {
         cout << " --------------------------------------------- \n"
-             << "|                  JobSearch                  |\n"
+             << "|                 JobSearch                   |\n"
              << " --------------------------------------------- \n"
              << "|     1.  -----------------------------       |\n"
              << "|        |         Register            |      |\n"
@@ -162,7 +163,7 @@ void MainMenu(Database& db)
              << "|        |      Forgot password        |      |\n"
              << "|         -----------------------------       |\n"
              << "|     4.  -----------------------------       |\n"
-             << "|        |            Exit              |     |\n"
+             << "|        |           Exit               |     |\n"
              << "|         -----------------------------       |\n"
              << " --------------------------------------------- \n";
         cout << "Please enter your choice: " << endl;
@@ -207,7 +208,7 @@ void LookForJobsMenu(Database& db, string& id)
     char option;
     while (true) {
         cout << " ---------------------------------------------------- \n"
-             << "|                      JobSearch                     |\n"
+             << "|                     JobSearch                      |\n"
              << " ---------------------------------------------------- \n"
              << "|     1.  --------------------------------------     |\n"
              << "|        |         View all the jobs            |    |\n"
@@ -221,7 +222,6 @@ void LookForJobsMenu(Database& db, string& id)
              << " ---------------------------------------------------- \n";
         cout << "Please enter your choice: " << endl;
 
-        ChangeColor(7,0);
         option = UserChoice();
         vector<string> filteredJobs;
         switch (option)
@@ -256,7 +256,8 @@ void LookForJobsMenu(Database& db, string& id)
 char UserChoice()
 {
     string optionInString;
-    getline(cin >> ws, optionInString);
+    fflush(stdin);
+    getline(cin, optionInString);
     if (optionInString.length() != 1)
         return '0';
     return optionInString[0];

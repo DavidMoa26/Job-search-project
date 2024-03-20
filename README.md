@@ -13,5 +13,4 @@ git clone https://github.com/DavidMoa26/Job-search-project.git
 cd Job-search-project
 git clone https://github.com/SRombauts/SQLiteCpp.git
 ```
-
-
+[Download database](https://fileport.io/myuvzKyPWHgr) - put the database file into cmake-build-debug directory.

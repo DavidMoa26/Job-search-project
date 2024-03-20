@@ -7,7 +7,6 @@
 using namespace SQLite;
 
 // Designing
-void ChangeColor(int textColor,int backgroundColor);
 void printLine(int width, char borderChar, char fillChar);
 void printRow(string text, int width, char borderChar);
 
